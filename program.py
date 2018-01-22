@@ -11,4 +11,3 @@ displayer.pack()
 displayer.add_function(f.calculate)
 
 root.mainloop()
-#  commit tes
