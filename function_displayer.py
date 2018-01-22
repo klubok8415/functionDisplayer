@@ -42,7 +42,7 @@ class Displayer:
                 point = [x+250, 250 - f(x / self.scale_x) * self.scale_y]
                 self._canvas.create_line(previous_point, point, fill=color)
                 previous_point = point
-            except ZeroDivisionError:
+            except:
                 pass
 
     def add_point(self, x, y, color="black"):
