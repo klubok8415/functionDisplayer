@@ -10,7 +10,7 @@ class Displayer:
         self._canvas.create_line(250, 500, 250, 0, width=1, arrow=LAST)  # drawing y_axis
         self._canvas.create_line(0, 250, 500, 250, width=1, arrow=LAST)  # drawing x_axis
 
-        # marking x)_axis
+        # marking x_axis
         for i in range(501):
             if i % 50 == 0:
                 k = -250 + i
