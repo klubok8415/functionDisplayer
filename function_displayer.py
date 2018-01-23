@@ -2,8 +2,8 @@ from tkinter import *
 
 
 class Displayer(Canvas):
-    def __init__(self, root, x_min=-10, y_min=0, x_max=10, y_max=50, x_scale=1, y_scale=1):
-        super(Displayer, self).__init__(root, width=500, height=500, bg="white")
+    def __init__(self, root, x_min=-10, y_min=-25, x_max=10, y_max=25, x_scale=1, y_scale=1):
+        super(Displayer, self).__init__(root, width=510, height=510, bg="white")
         self.create_line(250, 500, 250, 0, width=1, arrow=LAST)  # drawing y_axis
         self.create_line(0, 250, 500, 250, width=1, arrow=LAST)  # drawing x_axis
         self.x_max = x_max
