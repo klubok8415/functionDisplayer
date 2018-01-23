@@ -2,7 +2,7 @@ from tkinter import *
 
 
 class Displayer(Canvas):
-    def __init__(self, root, x_min=-10, y_min=-25, x_max=10, y_max=25, x_scale=1, y_scale=1):
+    def __init__(self, root, x_min=-25, y_min=-25, x_max=25, y_max=25, x_scale=1, y_scale=1):
         super(Displayer, self).__init__(root, width=510, height=510, bg="white")
         self.create_line(250, 500, 250, 0, width=1, arrow=LAST)  # drawing y_axis
         self.create_line(0, 250, 500, 250, width=1, arrow=LAST)  # drawing x_axis
@@ -53,4 +53,40 @@ class Displayer(Canvas):
             self.scale_x * x + 1,
             500 - self.scale_y * y - 1,
             fill=color)
+
+    @staticmethod
+    def rescale():
+        x_min = Handler.x_min_entry.get()
+        print(x_min)
+
+
+
+class Handler(Frame):
+    def __init__(self, root):
+        super(Handler, self).__init__(root)
+
+        # Entries and labels behind
+        self.x_min_entry = Entry(self, width=10)
+        self.x_max_entry = Entry(self, width=10)
+        self.y_min_entry = Entry(self, width=10)
+        self.y_max_entry = Entry(self, width=10)
+
+        self.x_min_label = Label(self, text='x min')
+        self.x_max_label = Label(self, text='x max')
+        self.y_max_label = Label(self, text='y max')
+        self.y_min_label = Label(self, text='y min')
+
+        self.x_min_label.grid(row=0, column=0)
+        self.x_max_label.grid(row=0, column=1)
+        self.x_min_entry.grid(row=1, column=0)
+        self.x_max_entry.grid(row=1, column=1)
+        self.y_min_label.grid(row=2, column=0)
+        self.y_max_label.grid(row=2, column=1)
+        self.y_min_entry.grid(row=3, column=0)
+        self.y_max_entry.grid(row=3, column=1)
+
+        # handling button
+        self.rescale_but = Button(self, text='rescale', command=Displayer.rescale)
+        self.rescale_but.grid(row=4, column=0, columnspan=2)
+
 

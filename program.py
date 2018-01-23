@@ -1,7 +1,6 @@
 from tkinter import *
-from function_displayer import Displayer
+from function_displayer import Displayer, Handler
 from expressions import Function
-from scale_handler import Handler
 
 f = Function.parse(input())
 
