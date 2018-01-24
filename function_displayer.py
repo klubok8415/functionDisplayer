@@ -108,4 +108,4 @@ class Handler(Frame):
         self.displayer.delete(ALL)
         self.displayer.add_axis(x_min, x_max, y_min, y_max)
         f = Function.parse(self.function_entry.get())
-        self.displayer.add_function(f, x_min, x_max, y_min, y_max)
+        self.displayer.add_function(f.calculate, x_min, x_max, y_min, y_max)
