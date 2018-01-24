@@ -19,42 +19,43 @@ class Displayer(Canvas):
                                        width=1, arrow=LAST)
 
         # marking x_axis
-        for i in range(501):
-            if i % 50 == 0:
-                k = -250 + i
-                self.create_line(k + 250, -2 + 250, k + 250, 2 + 250,
+        for i in range(self.canvas_size + 1):
+            if i % (self.canvas_size / 10) == 0:
+                k = -self.canvas_size // 2 + i
+                self.create_line(k + self.canvas_size // 2, -2 + self.canvas_size // 2,
+                                 k + self.canvas_size // 2, 2 + self.canvas_size // 2,
                                  width=0.25, fill='black')
 
-                self.create_text(k + 250, -10 + 250,
-                                 text=str(k * self.y_scale * (self.x_max - self.x_min) // (self.x_scale * 500)), fill='black',
+                self.create_text(k + self.canvas_size // 2, -10 + self.canvas_size // 2,
+                                 text=str(k * self.y_scale * (self.x_max - self.x_min) // (self.x_scale * self.canvas_size)), fill='black',
                                  font=('Helvectica', '10'))
         # marking y_axis
-        for j in range(501):
-            if j % 50 == 0:
-                k = -250 + j
+        for j in range(self.canvas_size + 1):
+            if j % (self.canvas_size / 10) == 0:
+                k = -self.canvas_size // 2 + j
                 if k != 0:
-                    self.create_line(-2 + 250, k + 250, 2 + 250, k + 250,
+                    self.create_line(-2 + self.canvas_size // 2, k + self.canvas_size // 2, 2 + self.canvas_size // 2, k + self.canvas_size // 2,
                                      width=0.25, fill='black')
 
-                    self.create_text(10 + 250, k + 250,
-                                     text=str(k * (self.y_max - self.y_min) // 500), fill='black',
+                    self.create_text(10 + self.canvas_size // 2, k + self.canvas_size // 2,
+                                     text=str(k * (self.y_max - self.y_min) // self.canvas_size), fill='black',
                                      font=('Helvectica', '10'))
 
     def add_function(self, f, color="black"):
         previous_point = [0, 0]
-        for x in range(-251, 250):
-            x = x * (self.x_max - self.x_min) / 500
-            point = [x * 500 // (self.x_max - self.x_min) + 250,
-                     250 - (f(x / self.x_scale) * self.y_scale) * 500 // (self.y_max - self.y_min)]
+        for x in range(-self.canvas_size // 2, self.canvas_size // 2 + 1):
+            x = x * (self.x_max - self.x_min) / self.canvas_size
+            point = [x * self.canvas_size // (self.x_max - self.x_min) + self.canvas_size // 2,
+                     self.canvas_size // 2 - (f(x / self.x_scale) * self.y_scale) * self.canvas_size // (self.y_max - self.y_min)]
             self.create_line(previous_point, point, fill=color)
             previous_point = point
 
     def add_point(self, x, y, color="black"):
         self.create_oval(
             self.x_scale * x - 1,
-            500 - self.y_scale * y + 1,
+            self.canvas_size - self.y_scale * y + 1,
             self.x_scale * x + 1,
-            500 - self.y_scale * y - 1,
+            self.canvas_size - self.y_scale * y - 1,
             fill=color)
 
 
