@@ -1,5 +1,5 @@
 from tkinter import *
-
+from expressions import Function
 
 class Displayer(Canvas):
     def __init__(self, root, x_scale=1, y_scale=1):
@@ -8,8 +8,6 @@ class Displayer(Canvas):
         self.y_scale = y_scale
 
     def add_axis(self, x_min=-5, x_max=5, y_min=-25, y_max=25):
-
-
         x_min = int(x_min)
         x_max = int(x_max)
         y_min = int(y_min)
@@ -40,6 +38,11 @@ class Displayer(Canvas):
                                      font=('Helvectica', '10'))
 
     def add_function(self, f, x_min=-5, x_max=5, y_min=-25, y_max=25, color="black"):
+        print('adding function')
+        x_min = int(x_min)
+        x_max = int(x_max)
+        y_min = int(y_min)
+        y_max = int(y_max)
         previous_point = [0, 0]
         for x in range(-251, 250):
             x = x * (x_max - x_min) / 500
@@ -64,7 +67,6 @@ class Handler(Frame):
     def __init__(self, root, displayer):
         super(Handler, self).__init__(root)
         self.displayer = displayer
-
         # Entries and labels behind
         self.x_min_entry = Entry(self, width=10)
         self.x_min_entry.insert(0, '-5')
@@ -74,12 +76,13 @@ class Handler(Frame):
         self.y_min_entry.insert(0, '-25')
         self.y_max_entry = Entry(self, width=10)
         self.y_max_entry.insert(0, '25')
-
+        self.function_entry = Entry(self, width=20)
 
         self.x_min_label = Label(self, text='x min')
         self.x_max_label = Label(self, text='x max')
         self.y_max_label = Label(self, text='y max')
         self.y_min_label = Label(self, text='y min')
+        self.function_label = Label(self, text='function input')
 
         self.x_min_label.grid(row=0, column=0)
         self.x_max_label.grid(row=0, column=1)
@@ -89,10 +92,12 @@ class Handler(Frame):
         self.y_max_label.grid(row=2, column=1)
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
+        self.function_label.grid(row=4, column=0, columnspan=2)
+        self.function_entry.grid(row=5, column=0, columnspan=2)
 
         # handling button
         self.rescale_but = Button(self, text='rescale', command=self.rescale)
-        self.rescale_but.grid(row=4, column=0, columnspan=2)
+        self.rescale_but.grid(row=6, column=0, columnspan=2)
 
     def rescale(self):
         print('rescaling')
@@ -100,4 +105,7 @@ class Handler(Frame):
         x_max = self.x_max_entry.get()
         y_min = self.y_min_entry.get()
         y_max = self.y_max_entry.get()
+        self.displayer.delete(ALL)
         self.displayer.add_axis(x_min, x_max, y_min, y_max)
+        f = Function.parse(self.function_entry.get())
+        self.displayer.add_function(f, x_min, x_max, y_min, y_max)
