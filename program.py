@@ -1,7 +1,5 @@
 from tkinter import *
 from function_displayer import Displayer, Handler
-from expressions import Function
-
 
 root = Tk()
 

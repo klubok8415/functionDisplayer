@@ -38,7 +38,6 @@ class Displayer(Canvas):
                                      font=('Helvectica', '10'))
 
     def add_function(self, f, x_min=-5, x_max=5, y_min=-25, y_max=25, color="black"):
-        print('adding function')
         x_min = int(x_min)
         x_max = int(x_max)
         y_min = int(y_min)
@@ -96,11 +95,10 @@ class Handler(Frame):
         self.function_entry.grid(row=5, column=0, columnspan=2)
 
         # handling button
-        self.rescale_but = Button(self, text='rescale', command=self.rescale)
+        self.rescale_but = Button(self, text='draw', command=self.rescale)
         self.rescale_but.grid(row=6, column=0, columnspan=2)
 
     def rescale(self):
-        print('rescaling')
         x_min = self.x_min_entry.get()
         x_max = self.x_max_entry.get()
         y_min = self.y_min_entry.get()
