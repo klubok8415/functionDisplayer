@@ -8,12 +8,14 @@ class Displayer(Canvas):
         self.y_scale = y_scale
 
     def add_axis(self, x_min=-5, x_max=5, y_min=-25, y_max=25):
+
+
         x_min = int(x_min)
         x_max = int(x_max)
         y_min = int(y_min)
         y_max = int(y_max)
-        self.create_line(250, 500, 250, 0, width=1, arrow=LAST)
-        self.create_line(0, 250, 500, 250, width=1, arrow=LAST)
+        self.y_axis = self.create_line(250, 500, 250, 0, width=1, arrow=LAST)
+        self.x_axis = self.create_line(0, 250, 500, 250, width=1, arrow=LAST)
 
         # marking x_axis
         for i in range(501):
@@ -89,13 +91,13 @@ class Handler(Frame):
         self.y_max_entry.grid(row=3, column=1)
 
         # handling button
-        self.rescale_but = Button(self, text='rescale', command=self.rescale(self.displayer))
+        self.rescale_but = Button(self, text='rescale', command=self.rescale)
         self.rescale_but.grid(row=4, column=0, columnspan=2)
 
-    def rescale(self, displayer):
+    def rescale(self):
         print('rescaling')
         x_min = self.x_min_entry.get()
         x_max = self.x_max_entry.get()
         y_min = self.y_min_entry.get()
         y_max = self.y_max_entry.get()
-        displayer.add_axis(x_min, x_max, y_min, y_max)
+        self.displayer.add_axis(x_min, x_max, y_min, y_max)
