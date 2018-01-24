@@ -2,7 +2,7 @@ from tkinter import *
 
 
 class Displayer(Canvas):
-    def __init__(self, root, x_min=-25, y_min=-25, x_max=25, y_max=25, x_scale=1, y_scale=1):
+    def __init__(self, root, x_min=-5, y_min=-25, x_max=5, y_max=25, x_scale=1, y_scale=1):
         super(Displayer, self).__init__(root, width=510, height=510, bg="white")
         self.create_line(250, 500, 250, 0, width=1, arrow=LAST)  # drawing y_axis
         self.create_line(0, 250, 500, 250, width=1, arrow=LAST)  # drawing x_axis
@@ -37,7 +37,8 @@ class Displayer(Canvas):
 
     def add_function(self, f, color="black"):
         previous_point = [0, 0]
-        for x in range(self.x_min, self.x_max):
+        for x in range(-251, 250):
+            x = x * (self.x_max - self.x_min) / 500
             try:
                 point = [x * 500 // (self.x_max - self.x_min) + 250,
                          250 - (f(x / self.scale_x) * self.scale_y) * 500 // (self.y_max - self.y_min)]
