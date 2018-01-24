@@ -8,10 +8,6 @@ class Displayer(Canvas):
         self.y_scale = y_scale
 
     def add_axis(self, x_min, x_max, y_min, y_max):
-        x_min = int(x_min)
-        x_max = int(x_max)
-        y_min = int(y_min)
-        y_max = int(y_max)
         self.y_axis = self.create_line(250, 500, 250, 0, width=1, arrow=LAST)
         self.x_axis = self.create_line(0, 250, 500, 250, width=1, arrow=LAST)
 
@@ -38,10 +34,6 @@ class Displayer(Canvas):
                                      font=('Helvectica', '10'))
 
     def add_function(self, f, x_min, x_max, y_min, y_max, color="black"):
-        x_min = int(x_min)
-        x_max = int(x_max)
-        y_min = int(y_min)
-        y_max = int(y_max)
         previous_point = [0, 0]
         for x in range(-251, 250):
             x = x * (x_max - x_min) / 500
@@ -104,6 +96,6 @@ class Handler(Frame):
         y_min = self.y_min_entry.get()
         y_max = self.y_max_entry.get()
         self.displayer.delete(ALL)
-        self.displayer.add_axis(x_min, x_max, y_min, y_max)
+        self.displayer.add_axis(int(x_min), int(x_max), int(y_min), int(y_max))
         f = Function.parse(self.function_entry.get())
-        self.displayer.add_function(f.calculate, x_min, x_max, y_min, y_max)
+        self.displayer.add_function(f.calculate, int(x_min), int(x_max), int(y_min), int(y_max))
