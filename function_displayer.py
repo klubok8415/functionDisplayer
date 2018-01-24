@@ -7,7 +7,7 @@ class Displayer(Canvas):
         self.x_scale = x_scale
         self.y_scale = y_scale
 
-    def add_axis(self, x_min=-5, x_max=5, y_min=-25, y_max=25):
+    def add_axis(self, x_min, x_max, y_min, y_max):
         x_min = int(x_min)
         x_max = int(x_max)
         y_min = int(y_min)
@@ -37,7 +37,7 @@ class Displayer(Canvas):
                                      text=str(k * (y_max - y_min) // 500), fill='black',
                                      font=('Helvectica', '10'))
 
-    def add_function(self, f, x_min=-5, x_max=5, y_min=-25, y_max=25, color="black"):
+    def add_function(self, f, x_min, x_max, y_min, y_max, color="black"):
         x_min = int(x_min)
         x_max = int(x_max)
         y_min = int(y_min)

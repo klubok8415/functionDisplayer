@@ -12,6 +12,4 @@ frame1.grid(row=0, column=0)
 handler.grid(row=0, column=1)
 displayer.pack()
 
-displayer.add_axis()
-
 root.mainloop()
