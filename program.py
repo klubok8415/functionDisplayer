@@ -4,7 +4,7 @@ from function_displayer import Displayer, Handler
 root = Tk()
 
 frame1 = Frame(root)
-displayer = Displayer(frame1)
+displayer = Displayer(frame1, 0, 0, 0, 0)
 handler = Handler(root, displayer)
 
 
