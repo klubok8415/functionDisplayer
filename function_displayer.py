@@ -37,8 +37,8 @@ class Displayer(Canvas):
                     self.create_line(-2 + self.canvas_size // 2, k + self.canvas_size // 2, 2 + self.canvas_size // 2, k + self.canvas_size // 2,
                                      width=0.25, fill='black')
 
-                    self.create_text(10 + self.canvas_size // 2, k + self.canvas_size // 2,
-                                     text=str(k * (self.y_max - self.y_min) // self.canvas_size), fill='black',
+                    self.create_text(15 + self.canvas_size // 2, k + self.canvas_size // 2,
+                                     text=str(-k * (self.y_max - self.y_min) // self.canvas_size), fill='black',
                                      font=('Helvectica', '10'))
 
     def add_function(self, f, color="black"):
@@ -57,6 +57,16 @@ class Displayer(Canvas):
             self.x_scale * x + 1,
             self.canvas_size - self.y_scale * y - 1,
             fill=color)
+
+    def rescale(self, f, x_min, x_max, y_min, y_max):
+        self.x_max = x_max
+        self.x_min = x_min
+        self.y_min = y_min
+        self.y_max = y_max
+        self.delete(ALL)
+        self.add_axis()
+        f = Function.parse(f)
+        self.add_function(f.calculate)
 
 
 class Handler(Frame):
@@ -92,15 +102,13 @@ class Handler(Frame):
         self.function_entry.grid(row=5, column=0, columnspan=2)
 
         # handling button
-        self.rescale_but = Button(self, text='draw', command=self.rescale)
+        self.rescale_but = Button(self, text='draw', command=self.on_click)
         self.rescale_but.grid(row=6, column=0, columnspan=2)
 
-    def rescale(self):
-        self.displayer.x_max = int(self.x_max_entry.get())
-        self.displayer.x_min = int(self.x_min_entry.get())
-        self.displayer.y_max = int(self.y_max_entry.get())
-        self.displayer.y_mix = int(self.y_min_entry.get())
-        self.displayer.delete(ALL)
-        self.displayer.add_axis()
-        f = Function.parse(self.function_entry.get())
-        self.displayer.add_function(f.calculate)
+    def on_click(self):
+        x_max = int(self.x_max_entry.get())
+        x_min = int(self.x_min_entry.get())
+        y_max = int(self.y_max_entry.get())
+        y_min = int(self.y_min_entry.get())
+        f = self.function_entry.get()
+        self.displayer.rescale(f, x_min, x_max, y_min, y_max)
