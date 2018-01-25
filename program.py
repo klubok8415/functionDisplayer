@@ -1,4 +1,5 @@
-from MainFrame import MainFrame
+from gui import MainFrame
+
 
 MainFrame = MainFrame()
-MainFrame.mainloop()
+MainFrame.start()
