@@ -1,15 +1,4 @@
-from tkinter import *
-from function_displayer import Displayer, Handler
+from MainFrame import MainFrame
 
-root = Tk()
-
-frame1 = Frame(root)
-displayer = Displayer(frame1, 0, 0, 0, 0)
-handler = Handler(root, displayer)
-
-
-frame1.grid(row=0, column=0)
-handler.grid(row=0, column=1)
-displayer.pack()
-
-root.mainloop()
+MainFrame = MainFrame()
+MainFrame.mainloop()
