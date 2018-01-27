@@ -1,5 +1,6 @@
 from tkinter import *
 from expressions import Function
+from function_parser import default_parser
 
 
 class Displayer(Canvas):
@@ -65,8 +66,8 @@ class Displayer(Canvas):
         self.y_max = y_max
         self.delete(ALL)
         self.add_axis()
-        f = Function.parse(f)
-        self.add_function(f.calculate)
+
+        self.add_function(default_parser.parse(f).calculate)
 
 
 class Handler(Frame):
