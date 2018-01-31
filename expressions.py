@@ -1,5 +1,7 @@
 import math
 
+import numpy
+
 
 class Value:
     def __init__(self, value):
@@ -12,9 +14,6 @@ class Value:
 class Operation:
     def __init__(self, args):
         self.args = args
-
-    def calculate(self):
-        raise NotImplementedError()
 
 
 class Inversion(Operation):
@@ -39,12 +38,16 @@ class Multiplication(Operation):
 
 class Division(Operation):
     def calculate(self):
-        return self.args[0].calculate() / self.args[1].calculate()
+        n = self.args[1].calculate()
+        return numpy.nan if n == 0 else self.args[0].calculate() / n
 
 
 class Power(Operation):
     def calculate(self):
-        return self.args[0].calculate() ** self.args[1].calculate()
+        x = self.args[0].calculate()
+        power = self.args[1].calculate()
+
+        return numpy.nan if (x == 0 and power < 0) or (x < 0 and math.modf(power)[0] != 0) else x**power
 
 
 class Modulus(Operation):
@@ -59,7 +62,10 @@ class Sinus(Operation):
 
 class Logarithm(Operation):
     def calculate(self):
-        return math.log(self.args[0].calculate(), self.args[1].calculate())
+        x = self.args[0].calculate()
+        base = self.args[1].calculate()
+
+        return math.log(x, base) if base > 0 and base != 1 and x > 0 else numpy.nan
 
 
 class Function:

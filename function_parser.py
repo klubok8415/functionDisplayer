@@ -105,18 +105,13 @@ class Operator:
                 if string[i:].startswith(b):
                     braces_counters[closing_braces.index(b)] -= 1
 
-            try:
-                brace_index = closing_braces.index(s)
-            except ValueError:
-                pass
-            else:
-                braces_counters[brace_index] -= 1
-
-            if all(b == 0 for b in braces_counters) and string[i:].startswith(self.name):
-                args = [parsing_function(a) for a in [string[:i], string[i + 1:]]]
+            if all(b == 0 for b in braces_counters) \
+                    and string[i:].startswith(self.name) \
+                    and (len(self.name) > 0 or i != 0):
+                args = [parsing_function(a) for a in [string[:i], string[i + len(self.name):]]]
 
                 if any(a is None for a in args):
-                    return None
+                    continue
                 return Function.concat(args, self.operation)
         else:
             return None

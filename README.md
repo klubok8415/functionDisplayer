@@ -1,6 +1,6 @@
 # functionParser
 
-Parses a function into an expression tree and displays its graph.
+Parses a function into an expression tree and displays a graph of the function.
 
 ## Authors:
 
