@@ -1,16 +1,17 @@
 from tkinter import *
-from expressions import Function
 from function_parser import default_parser
 
 
 class Displayer(Canvas):
-    def __init__(self, root,  x_min, x_max, y_min, y_max, canvas_size=500):
-        super(Displayer, self).__init__(root, width=canvas_size, height=canvas_size, bg="white")
+
+    def __init__(self, root, x_min=0, x_max=0, y_min=0, y_max=0, canvas_size=500):
+        self.root = root
         self.canvas_size = canvas_size
         self.x_min = x_min
         self.x_max = x_max
         self.y_min = y_min
         self.y_max = y_max
+        super(Displayer, self).__init__(root, width=canvas_size, height=canvas_size, bg='white')
 
     def add_axis(self):
         x_position = self.canvas_size // 2 + (self.y_max + self.y_min) / 2 * self.canvas_size / (self.y_max - self.y_min)
@@ -66,30 +67,37 @@ class Displayer(Canvas):
         self.y_max = y_max
         self.delete(ALL)
         self.add_axis()
-
         self.add_function(default_parser.parse(f).calculate)
 
 
-class Handler(Frame):
-    def __init__(self, root, displayer):
-        super(Handler, self).__init__(root)
-        self.displayer = displayer
-        # Entries and labels behind
-        self.x_min_entry = Entry(self, width=10)
-        self.x_min_entry.insert(0, '-5')
-        self.x_max_entry = Entry(self, width=10)
-        self.x_max_entry.insert(0, '5')
-        self.y_min_entry = Entry(self, width=10)
-        self.y_min_entry.insert(0, '-25')
-        self.y_max_entry = Entry(self, width=10)
-        self.y_max_entry.insert(0, '25')
-        self.function_entry = Entry(self, width=20)
+class MainFrame:
 
-        self.x_min_label = Label(self, text='x min')
-        self.x_max_label = Label(self, text='x max')
-        self.y_max_label = Label(self, text='y max')
-        self.y_min_label = Label(self, text='y min')
-        self.function_label = Label(self, text='function input')
+    def __init__(self):
+
+        self.root = Tk()
+        self.canvas_frame = Frame(self.root)
+        self.handler_frame = Frame(self.root)
+        self.displayer = Displayer(self.canvas_frame)
+        self.canvas_frame.grid(row=0, column=0)
+        self.handler_frame.grid(row=0, column=1)
+        self.displayer.pack()
+
+        # Entries and labels below
+        self.x_min_entry = Entry(self.handler_frame, width=10)
+        self.x_min_entry.insert(0, '-5')
+        self.x_max_entry = Entry(self.handler_frame, width=10)
+        self.x_max_entry.insert(0, '5')
+        self.y_min_entry = Entry(self.handler_frame, width=10)
+        self.y_min_entry.insert(0, '-25')
+        self.y_max_entry = Entry(self.handler_frame, width=10)
+        self.y_max_entry.insert(0, '25')
+        self.function_entry = Entry(self.handler_frame, width=20)
+
+        self.x_min_label = Label(self.handler_frame, text='x min')
+        self.x_max_label = Label(self.handler_frame, text='x max')
+        self.y_max_label = Label(self.handler_frame, text='y max')
+        self.y_min_label = Label(self.handler_frame, text='y min')
+        self.function_label = Label(self.handler_frame, text='function input')
 
         self.x_min_label.grid(row=0, column=0)
         self.x_max_label.grid(row=0, column=1)
@@ -103,7 +111,7 @@ class Handler(Frame):
         self.function_entry.grid(row=5, column=0, columnspan=2)
 
         # handling button
-        self.rescale_but = Button(self, text='draw', command=self.on_click)
+        self.rescale_but = Button(self.handler_frame, text='draw', command=self.on_click)
         self.rescale_but.grid(row=6, column=0, columnspan=2)
 
     def on_click(self):
@@ -114,16 +122,9 @@ class Handler(Frame):
         f = self.function_entry.get()
         self.displayer.rescale(f, x_min, x_max, y_min, y_max)
 
-
-class MainFrame:
-    def __init__(self):
-        self.root = Tk()
-        self.canvas_frame = Frame()
-        self.displayer = Displayer(self.canvas_frame, 0, 0, 0, 0)
-        self.handler_frame = Handler(self.root, self.displayer)
-        self.canvas_frame.grid(row=0, column=0)
-        self.handler_frame.grid(row=0, column=1)
-        self.displayer.pack()
-
     def start(self):
         self.root.mainloop()
+
+
+if __name__ == '__main__':
+    MainFrame().start()
