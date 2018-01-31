@@ -116,12 +116,17 @@ class MainFrame:
         self.y_max_entry.grid(row=3, column=1)
         self.function_label.grid(row=4, column=0, columnspan=2)
         self.function_entry.grid(row=5, column=0, columnspan=2)
+        self.function_entry.bind('<Return>', self.on_click)
+
 
         # handling button
-        self.rescale_but = Button(self.handler_frame, text='draw', command=self.on_click)
+        self.rescale_but = Button(self.handler_frame, text='draw')
+        self.rescale_but.bind('<Button-1>', self.on_click)
         self.rescale_but.grid(row=6, column=0, columnspan=2)
 
-    def on_click(self):
+    def on_click(self, event):
+        if self.function_entry.get() == '':
+            return
         self.displayer.rescale(
             self.function_entry.get(),
             int(self.x_min_entry.get()),
