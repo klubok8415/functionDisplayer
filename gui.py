@@ -1,6 +1,6 @@
 from tkinter import *
 from function_parser import default_parser
-
+import math
 
 class Displayer(Canvas):
 
@@ -50,6 +50,8 @@ class Displayer(Canvas):
         for x in range(self.canvas_size + 1):
             point = [x,  self.canvas_size - (self.canvas_size / (self.y_max - self.y_min) *
                                              (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min))]
+            if math.isnan(point[1]):
+                continue
             self.create_line(previous_point, point, fill=color)
             previous_point = point
 
