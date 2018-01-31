@@ -18,9 +18,9 @@ class Displayer(Canvas):
         y_position = self.canvas_size // 2 - (self.x_max + self.x_min) / 2 * self.canvas_size / (self.x_max - self.x_min)
 
         self.y_axis = self.create_line(y_position, self.canvas_size, y_position, 0,
-                                       width=1, arrow=LAST)
+                                       width=1, arrow=LAST, fill="gray")
         self.x_axis = self.create_line(0, x_position, self.canvas_size, x_position,
-                                       width=1, arrow=LAST)
+                                       width=1, arrow=LAST, fill="gray")
 
         # marking x_axis
         for i in range(self.canvas_size + 1):
@@ -28,7 +28,7 @@ class Displayer(Canvas):
                 k = -self.canvas_size // 2 + i
                 self.create_line(k + self.canvas_size // 2, -2 + x_position,
                                  k + self.canvas_size // 2, 2 + x_position,
-                                 width=0.25, fill='black')
+                                 width=0.25, fill='gray')
 
                 self.create_text(k + self.canvas_size // 2, -10 + x_position,
                                  text=str(k * (self.x_max - self.x_min) // self.canvas_size), fill='black',
@@ -39,20 +39,23 @@ class Displayer(Canvas):
                 k = -self.canvas_size // 2 + j
                 if k != 0:
                     self.create_line(-2 + y_position, k + self.canvas_size // 2, 2 + y_position, k + self.canvas_size // 2,
-                                     width=0.25, fill='black')
+                                     width=0.25, fill='gray')
 
                     self.create_text(15 + y_position, k + self.canvas_size // 2,
                                      text=str(-k * (self.y_max - self.y_min) // self.canvas_size), fill='black',
                                      font=('Helvectica', '10'))
 
-    def add_function(self, f, color="black"):
-        previous_point = [0, 0]
+    def add_function(self, f, color="blue"):
+        previous_point = None
         for x in range(self.canvas_size + 1):
             point = [x,  self.canvas_size - (self.canvas_size / (self.y_max - self.y_min) *
                                              (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min))]
             if math.isnan(point[1]):
+                previous_point = None
                 continue
-            self.create_line(previous_point, point, fill=color)
+
+            if previous_point is not None:
+                self.create_line(previous_point, point, fill=color)
             previous_point = point
 
     def add_point(self, x, y, color="black"):
