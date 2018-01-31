@@ -28,14 +28,20 @@ class Multiplication(Operation):
     def calculate(self):
         return self.args[0].calculate() * self.args[1].calculate()
 
+
+class Division(Operation):
+    def calculate(self):
+        return self.args[0].calculate() / self.args[1].calculate()
+
+
 class Power(Operation):
     def calculate(self):
         return self.args[0].calculate() ** self.args[1].calculate()
 
 
-class Division(Operation):
+class Modulus(Operation):
     def calculate(self):
-        return self.args[0].calculate() / self.args[1].calculate()
+        return abs(self.args[0].calculate())
 
 
 class Function:

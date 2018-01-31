@@ -14,9 +14,14 @@ class Brace:
                 and string[0] == self.opening_character \
                 and string[-1] == self.closing_character:
 
-            return parsing_function(string[1:-1]) \
+            argument = parsing_function(string[1:-1])
+
+            if argument is None:
+                return None
+
+            return argument \
                 if self.operation is None \
-                else Function.concat([parsing_function(string[1:-1])], self.operation)
+                else Function.concat([argument], self.operation)
         else:
             return None
 
@@ -59,14 +64,16 @@ class Operator:
             try:
                 brace_index = opening_braces.index(s)
             except ValueError:
-                try:
-                    brace_index = closing_braces.index(s)
-                except ValueError:
-                    pass
-                else:
-                    braces_counters[brace_index] -= 1
+                pass
             else:
                 braces_counters[brace_index] += 1
+
+            try:
+                brace_index = closing_braces.index(s)
+            except ValueError:
+                pass
+            else:
+                braces_counters[brace_index] -= 1
 
             if all(b == 0 for b in braces_counters) and s == self.character:
 
@@ -126,5 +133,6 @@ default_parser = Parser(
         ]
     ],
     [
-        Brace("(", ")")
+        Brace("(", ")"),
+        Brace("|", "|", operation=Modulus)
     ])
