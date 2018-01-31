@@ -3,6 +3,24 @@ import itertools
 from expressions import *
 
 
+class Brace:
+    def __init__(self, opening_character, closing_character, operation=None):
+        self.opening_character = opening_character
+        self.closing_character = closing_character
+        self.operation = operation
+
+    def parse(self, string, parsing_function):
+        if len(string) > 1 \
+                and string[0] == self.opening_character \
+                and string[-1] == self.closing_character:
+
+            return parsing_function(string[1:-1]) \
+                if self.operation is None \
+                else Function.concat([parsing_function(string[1:-1])], self.operation)
+        else:
+            return None
+
+
 class VariableOperator:
     @staticmethod
     def parse(string, parsing_function):
@@ -52,8 +70,9 @@ class Operator:
 
 
 class Parser:
-    def __init__(self, operators):
-        self.operators = operators
+    def __init__(self, operators, braces):
+        self.operators = braces + operators
+        self.braces = braces
 
     def parse(self, string):
         string = string.replace(" ", "")
@@ -64,11 +83,6 @@ class Parser:
         return self._parse(string)
 
     def _parse(self, string):
-        if len(string) > 1 and string[0] == "(" and string[-1] == ")":
-            string = string[1:-1]
-
-        # operator
-
         for current_operators in self.operators:
             for o in current_operators:
                 result = o.parse(string, self._parse)
@@ -83,20 +97,26 @@ class Parser:
         return None
 
 
-default_parser = Parser([
-    {
-        Operator("+", Addition),
-        Operator("-", Deduction),
-    },
-    {
-        Operator("*", Multiplication),
-        Operator("/", Division),
-    },
-    {
-        Operator("^", Power),
-    },
-    {
-        VariableOperator,
-        ConstantOperator,
-    }
-])
+default_parser = Parser(
+    [
+        [
+            Operator("+", Addition),
+            Operator("-", Deduction),
+        ],
+        [
+            Operator("*", Multiplication),
+            Operator("/", Division),
+        ],
+        [
+            Operator("^", Power),
+        ],
+        [
+            VariableOperator,
+            ConstantOperator,
+        ]
+    ],
+    [
+        [
+            Brace("(", ")")
+        ]
+    ])
