@@ -6,6 +6,25 @@ class Operator:
         self.character = character
         self.operation = operation
 
+    def parse(self, string):
+        """Returns None, if parsing is not possible, else (operation, arguments strings)"""
+
+        braces = 0
+        operator_position = len(string) - 1
+
+        for s in string[::-1]:
+            if s == "(":
+                braces -= 1
+            elif s == ")":
+                braces += 1
+
+            if braces == 0 and s == self.character:
+                return self.operation, [string[:operator_position], string[operator_position + 1:]]
+
+            operator_position -= 1
+        else:
+            return None
+
 
 class Parser:
     def __init__(self, operators):
@@ -23,9 +42,13 @@ class Parser:
         if string[0] == "(" and string[-1] == ")":
             string = string[1:-1]
 
+        # variable
+
         if string == "x":
             v = Value(0)
             return Function(v, [v])
+
+        # constant value
 
         try:
             value = float(string)
@@ -34,33 +57,23 @@ class Parser:
         else:
             return Function(Value(value), [])
 
+        # operator
+
         for current_operators in self.operators:
-            operators_by_character = {o.character: o for o in current_operators}
+            for o in current_operators:
+                parsing_result = o.parse(string)
 
-            operator_position = len(string) - 1
-            braces = 0
-
-            for s in string[::-1]:
-                if s == "(":
-                    braces -= 1
-                elif s == ")":
-                    braces += 1
-
-                if braces == 0:
-                    operator = operators_by_character.get(s)
-                    if operator is not None:
-                        break
-
-                operator_position -= 1
+                if parsing_result is not None:
+                    operation, args = parsing_result
+                    break
             else:
                 continue
 
-            arg1 = self._parse(string[:operator_position])
-            arg2 = self._parse(string[operator_position + 1:])
-
-            return Function(
-                operator.operation(arg1.expression, arg2.expression),
-                arg1.variables + arg2.variables)
+            args = [self._parse(a) for a in args]
+            try:
+                return Function(operation(*[a.expression for a in args]), sum(a.variables for a in args))
+            except TypeError:
+                print([a.variables for a in args])
 
         raise Exception()
 

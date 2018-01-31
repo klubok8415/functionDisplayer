@@ -7,27 +7,26 @@ class Value:
 
 
 class Addition:
-    def __init__(self, arg1, arg2):
-        self.arg1 = arg1
-        self.arg2 = arg2
+    def __init__(self, *args):
+        self.args = args
 
     def calculate(self):
-        return self.arg1.calculate() + self.arg2.calculate()
+        return sum(a.calculate for a in self.args)
 
 
 class Deduction(Addition):
     def calculate(self):
-        return self.arg1.calculate() - self.arg2.calculate()
+        return self.args[0].calculate() - self.args[1].calculate()
 
 
 class Multiplication(Addition):
     def calculate(self):
-        return self.arg1.calculate() * self.arg2.calculate()
+        return self.args[0].calculate() * self.args[1].calculate()
 
 
 class Division(Addition):
     def calculate(self):
-        return self.arg1.calculate() / self.arg2.calculate()
+        return self.args[0].calculate() / self.args[1].calculate()
 
 
 class Function:
