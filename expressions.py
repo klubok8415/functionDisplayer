@@ -1,3 +1,6 @@
+import math
+
+
 class Value:
     def __init__(self, value):
         self.value = value
@@ -42,6 +45,16 @@ class Power(Operation):
 class Modulus(Operation):
     def calculate(self):
         return abs(self.args[0].calculate())
+
+
+class Sinus(Operation):
+    def calculate(self):
+        return math.sin(self.args[0].calculate())
+
+
+class Logarithm(Operation):
+    def calculate(self):
+        return math.log(self.args[0].calculate(), self.args[1].calculate())
 
 
 class Function:
