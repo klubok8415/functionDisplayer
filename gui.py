@@ -16,6 +16,7 @@ class Displayer(Canvas):
     def add_axis(self):
         x_position = self.canvas_size // 2 + (self.y_max + self.y_min) / 2 * self.canvas_size / (self.y_max - self.y_min)
         y_position = self.canvas_size // 2 - (self.x_max + self.x_min) / 2 * self.canvas_size / (self.x_max - self.x_min)
+
         self.y_axis = self.create_line(y_position, self.canvas_size, y_position, 0,
                                        width=1, arrow=LAST)
         self.x_axis = self.create_line(0, x_position, self.canvas_size, x_position,
@@ -115,12 +116,12 @@ class MainFrame:
         self.rescale_but.grid(row=6, column=0, columnspan=2)
 
     def on_click(self):
-        x_max = int(self.x_max_entry.get())
-        x_min = int(self.x_min_entry.get())
-        y_max = int(self.y_max_entry.get())
-        y_min = int(self.y_min_entry.get())
-        f = self.function_entry.get()
-        self.displayer.rescale(f, x_min, x_max, y_min, y_max)
+        self.displayer.rescale(
+            self.function_entry.get(),
+            int(self.x_max_entry.get()),
+            int(self.x_min_entry.get()),
+            int(self.y_max_entry.get()),
+            int(self.y_min_entry.get()))
 
     def start(self):
         self.root.mainloop()

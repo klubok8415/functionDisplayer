@@ -11,7 +11,7 @@ class Addition:
         self.args = args
 
     def calculate(self):
-        return sum(a.calculate for a in self.args)
+        return sum(a.calculate() for a in self.args)
 
 
 class Deduction(Addition):

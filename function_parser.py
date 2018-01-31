@@ -1,3 +1,5 @@
+import itertools
+
 from expressions import *
 
 
@@ -70,10 +72,7 @@ class Parser:
                 continue
 
             args = [self._parse(a) for a in args]
-            try:
-                return Function(operation(*[a.expression for a in args]), sum(a.variables for a in args))
-            except TypeError:
-                print([a.variables for a in args])
+            return Function(operation(*[a.expression for a in args]), sum([a.variables for a in args], []))
 
         raise Exception()
 
