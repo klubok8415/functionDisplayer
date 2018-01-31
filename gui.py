@@ -92,13 +92,18 @@ class MainFrame:
         # Entries and labels below
         self.x_min_entry = Entry(self.handler_frame, width=10)
         self.x_min_entry.insert(0, '-5')
+        self.x_min_entry.bind('<Return>', self.on_click)
         self.x_max_entry = Entry(self.handler_frame, width=10)
         self.x_max_entry.insert(0, '5')
+        self.x_max_entry.bind('<Return>', self.on_click)
         self.y_min_entry = Entry(self.handler_frame, width=10)
         self.y_min_entry.insert(0, '-25')
+        self.y_min_entry.bind('<Return>', self.on_click)
         self.y_max_entry = Entry(self.handler_frame, width=10)
         self.y_max_entry.insert(0, '25')
+        self.y_max_entry.bind('<Return>', self.on_click)
         self.function_entry = Entry(self.handler_frame, width=20)
+        self.function_entry.bind('<Return>', self.on_click)
 
         self.x_min_label = Label(self.handler_frame, text='x min')
         self.x_max_label = Label(self.handler_frame, text='x max')
@@ -116,8 +121,6 @@ class MainFrame:
         self.y_max_entry.grid(row=3, column=1)
         self.function_label.grid(row=4, column=0, columnspan=2)
         self.function_entry.grid(row=5, column=0, columnspan=2)
-        self.function_entry.bind('<Return>', self.on_click)
-
 
         # handling button
         self.rescale_but = Button(self.handler_frame, text='draw')
