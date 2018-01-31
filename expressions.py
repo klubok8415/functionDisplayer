@@ -6,25 +6,34 @@ class Value:
         return self.value
 
 
-class Addition:
-    def __init__(self, *args):
+class Operation:
+    def __init__(self, args):
         self.args = args
 
+    def calculate(self):
+        raise NotImplementedError()
+
+
+class Addition(Operation):
     def calculate(self):
         return sum(a.calculate() for a in self.args)
 
 
-class Deduction(Addition):
+class Deduction(Operation):
     def calculate(self):
         return self.args[0].calculate() - self.args[1].calculate()
 
 
-class Multiplication(Addition):
+class Multiplication(Operation):
     def calculate(self):
         return self.args[0].calculate() * self.args[1].calculate()
 
+class Power(Operation):
+    def calculate(self):
+        return self.args[0].calculate() ** self.args[1].calculate()
 
-class Division(Addition):
+
+class Division(Operation):
     def calculate(self):
         return self.args[0].calculate() / self.args[1].calculate()
 
@@ -33,6 +42,10 @@ class Function:
     def __init__(self, expression, variables):
         self.expression = expression
         self.variables = variables
+
+    @staticmethod
+    def concat(functions, operation):
+        return Function(operation([f.expression for f in functions]), sum([f.variables for f in functions], []))
 
     def calculate(self, x):
         for var in self.variables:

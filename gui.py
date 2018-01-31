@@ -118,10 +118,10 @@ class MainFrame:
     def on_click(self):
         self.displayer.rescale(
             self.function_entry.get(),
-            int(self.x_max_entry.get()),
             int(self.x_min_entry.get()),
-            int(self.y_max_entry.get()),
-            int(self.y_min_entry.get()))
+            int(self.x_max_entry.get()),
+            int(self.y_min_entry.get()),
+            int(self.y_max_entry.get()))
 
     def start(self):
         self.root.mainloop()

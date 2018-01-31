@@ -3,13 +3,33 @@ import itertools
 from expressions import *
 
 
+class VariableOperator:
+    @staticmethod
+    def parse(string, parsing_function):
+        if string == "x":
+            v = Value(0)
+            return Function(v, [v])
+        return None
+
+
+class ConstantOperator:
+    @staticmethod
+    def parse(string, parsing_function):
+        try:
+            value = float(string)
+        except ValueError:
+            return None
+        else:
+            return Function(Value(value), [])
+
+
 class Operator:
     def __init__(self, character, operation):
         self.character = character
         self.operation = operation
 
-    def parse(self, string):
-        """Returns None, if parsing is not possible, else (operation, arguments strings)"""
+    def parse(self, string, parsing_function):
+        """Returns None, if parsing is not possible, else new function"""
 
         braces = 0
         operator_position = len(string) - 1
@@ -21,7 +41,10 @@ class Operator:
                 braces += 1
 
             if braces == 0 and s == self.character:
-                return self.operation, [string[:operator_position], string[operator_position + 1:]]
+                args = [parsing_function(a) for a in [string[:operator_position], string[operator_position + 1:]]]
+                if any(a is None for a in args):
+                    return None
+                return Function.concat(args, self.operation)
 
             operator_position -= 1
         else:
@@ -41,40 +64,23 @@ class Parser:
         return self._parse(string)
 
     def _parse(self, string):
-        if string[0] == "(" and string[-1] == ")":
+        if len(string) > 1 and string[0] == "(" and string[-1] == ")":
             string = string[1:-1]
-
-        # variable
-
-        if string == "x":
-            v = Value(0)
-            return Function(v, [v])
-
-        # constant value
-
-        try:
-            value = float(string)
-        except ValueError:
-            pass
-        else:
-            return Function(Value(value), [])
 
         # operator
 
         for current_operators in self.operators:
             for o in current_operators:
-                parsing_result = o.parse(string)
+                result = o.parse(string, self._parse)
 
-                if parsing_result is not None:
-                    operation, args = parsing_result
+                if result is not None:
                     break
             else:
                 continue
 
-            args = [self._parse(a) for a in args]
-            return Function(operation(*[a.expression for a in args]), sum([a.variables for a in args], []))
+            return result
 
-        raise Exception()
+        return None
 
 
 default_parser = Parser([
@@ -86,4 +92,11 @@ default_parser = Parser([
         Operator("*", Multiplication),
         Operator("/", Division),
     },
+    {
+        Operator("^", Power),
+    },
+    {
+        VariableOperator,
+        ConstantOperator,
+    }
 ])
