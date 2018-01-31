@@ -17,6 +17,11 @@ class Operation:
         raise NotImplementedError()
 
 
+class Inversion(Operation):
+    def calculate(self):
+        return -self.args[0].calculate()
+
+
 class Addition(Operation):
     def calculate(self):
         return sum(a.calculate() for a in self.args)

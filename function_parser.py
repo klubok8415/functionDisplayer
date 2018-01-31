@@ -3,6 +3,22 @@ import itertools
 from expressions import *
 
 
+class Prefix:
+    def __init__(self, name, operation):
+        self.name = name
+        self.operation = operation
+
+    def parse(self, string, parsing_function, braces_pairs):
+        if not string.startswith(self.name):
+            return None
+
+        argument = parsing_function(string[len(self.name):])
+        if argument is None:
+            return None
+
+        return Function.concat([argument], self.operation)
+
+
 class FunctionOperator:
     def __init__(self, name, operation, args_number):
         self.name = name
@@ -32,11 +48,9 @@ class Brace:
         self.operation = operation
 
     def parse(self, string, parsing_function, braces_pairs):
-        if len(string) > 1 \
-                and string[0] == self.opening_character \
-                and string[-1] == self.closing_character:
+        if string.startswith(self.opening_character) and string.endswith(self.closing_character):
 
-            argument = parsing_function(string[1:-1])
+            argument = parsing_function(string[len(self.opening_character):-len(self.closing_character)])
 
             if argument is None:
                 return None
@@ -69,8 +83,8 @@ class ConstantOperator:
 
 
 class Operator:
-    def __init__(self, character, operation):
-        self.character = character
+    def __init__(self, name, operation):
+        self.name = name
         self.operation = operation
 
     def parse(self, string, parsing_function, braces_pairs):
@@ -80,15 +94,16 @@ class Operator:
         closing_braces = [pair[1] for pair in braces_pairs]
         braces_counters = [0] * len(braces_pairs)
 
-        operator_position = len(string) - 1
+        for i in range(len(string) - 1, -1, -1):
+            s = string[i]
 
-        for s in string[::-1]:
-            try:
-                brace_index = opening_braces.index(s)
-            except ValueError:
-                pass
-            else:
-                braces_counters[brace_index] += 1
+            for b in opening_braces:
+                if string[i:].startswith(b):
+                    braces_counters[opening_braces.index(b)] += 1
+
+            for b in closing_braces:
+                if string[i:].startswith(b):
+                    braces_counters[closing_braces.index(b)] -= 1
 
             try:
                 brace_index = closing_braces.index(s)
@@ -97,14 +112,12 @@ class Operator:
             else:
                 braces_counters[brace_index] -= 1
 
-            if all(b == 0 for b in braces_counters) and s == self.character:
-                args = [parsing_function(a) for a in [string[:operator_position], string[operator_position + 1:]]]
+            if all(b == 0 for b in braces_counters) and string[i:].startswith(self.name):
+                args = [parsing_function(a) for a in [string[:i], string[i + 1:]]]
 
                 if any(a is None for a in args):
                     return None
                 return Function.concat(args, self.operation)
-
-            operator_position -= 1
         else:
             return None
 
@@ -123,6 +136,9 @@ class Parser:
         return self._parse(string)
 
     def _parse(self, string):
+        if string == "":
+            return None
+
         for o in self.operators:
             result = o.parse(string, self._parse, self.braces_pairs)
 
@@ -135,6 +151,9 @@ default_parser = Parser(
     [
         Operator("+", Addition),
         Operator("-", Deduction),
+
+        Prefix("-", Inversion),
+
         Operator("*", Multiplication),
         Operator("/", Division),
 
