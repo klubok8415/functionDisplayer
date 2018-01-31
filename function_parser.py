@@ -9,7 +9,7 @@ class Brace:
         self.closing_character = closing_character
         self.operation = operation
 
-    def parse(self, string, parsing_function):
+    def parse(self, string, parsing_function, braces_pairs):
         if len(string) > 1 \
                 and string[0] == self.opening_character \
                 and string[-1] == self.closing_character:
@@ -23,7 +23,7 @@ class Brace:
 
 class VariableOperator:
     @staticmethod
-    def parse(string, parsing_function):
+    def parse(string, parsing_function, braces_pairs):
         if string == "x":
             v = Value(0)
             return Function(v, [v])
@@ -32,7 +32,7 @@ class VariableOperator:
 
 class ConstantOperator:
     @staticmethod
-    def parse(string, parsing_function):
+    def parse(string, parsing_function, braces_pairs):
         try:
             value = float(string)
         except ValueError:
@@ -46,20 +46,32 @@ class Operator:
         self.character = character
         self.operation = operation
 
-    def parse(self, string, parsing_function):
+    def parse(self, string, parsing_function, braces_pairs):
         """Returns None, if parsing is not possible, else new function"""
 
-        braces = 0
+        opening_braces = [pair[0] for pair in braces_pairs]
+        closing_braces = [pair[1] for pair in braces_pairs]
+        braces_counters = [0] * len(braces_pairs)
+
         operator_position = len(string) - 1
 
         for s in string[::-1]:
-            if s == "(":
-                braces -= 1
-            elif s == ")":
-                braces += 1
+            try:
+                brace_index = opening_braces.index(s)
+            except ValueError:
+                try:
+                    brace_index = closing_braces.index(s)
+                except ValueError:
+                    pass
+                else:
+                    braces_counters[brace_index] -= 1
+            else:
+                braces_counters[brace_index] += 1
 
-            if braces == 0 and s == self.character:
+            if all(b == 0 for b in braces_counters) and s == self.character:
+
                 args = [parsing_function(a) for a in [string[:operator_position], string[operator_position + 1:]]]
+
                 if any(a is None for a in args):
                     return None
                 return Function.concat(args, self.operation)
@@ -71,8 +83,8 @@ class Operator:
 
 class Parser:
     def __init__(self, operators, braces):
-        self.operators = braces + operators
-        self.braces = braces
+        self.operators = [braces] + operators
+        self.braces_pairs = [(b.opening_character, b.closing_character) for b in braces]
 
     def parse(self, string):
         string = string.replace(" ", "")
@@ -85,15 +97,13 @@ class Parser:
     def _parse(self, string):
         for current_operators in self.operators:
             for o in current_operators:
-                result = o.parse(string, self._parse)
+                result = o.parse(string, self._parse, self.braces_pairs)
 
                 if result is not None:
                     break
             else:
                 continue
-
             return result
-
         return None
 
 
@@ -116,7 +126,5 @@ default_parser = Parser(
         ]
     ],
     [
-        [
-            Brace("(", ")")
-        ]
+        Brace("(", ")")
     ])

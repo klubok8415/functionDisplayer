@@ -66,6 +66,7 @@ class Displayer(Canvas):
         self.x_min = x_min
         self.y_min = y_min
         self.y_max = y_max
+
         self.delete(ALL)
         self.add_axis()
         self.add_function(default_parser.parse(f).calculate)
