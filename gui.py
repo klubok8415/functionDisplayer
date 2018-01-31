@@ -13,7 +13,7 @@ class Displayer(Canvas):
         self.y_max = y_max
         super(Displayer, self).__init__(root, width=canvas_size, height=canvas_size, bg='white')
 
-    def add_axis(self):
+    def _update(self, f, color='blue'):
         x_position = self.canvas_size // 2 + (self.y_max + self.y_min) / 2 * self.canvas_size / (self.y_max - self.y_min)
         y_position = self.canvas_size // 2 - (self.x_max + self.x_min) / 2 * self.canvas_size / (self.x_max - self.x_min)
 
@@ -44,8 +44,6 @@ class Displayer(Canvas):
                     self.create_text(15 + y_position, k + self.canvas_size // 2,
                                      text=str(-k * (self.y_max - self.y_min) // self.canvas_size), fill='black',
                                      font=('Helvectica', '10'))
-
-    def add_function(self, f, color="blue"):
         previous_point = None
         for x in range(self.canvas_size + 1):
             point = [x,  self.canvas_size - (self.canvas_size / (self.y_max - self.y_min) *
@@ -73,8 +71,7 @@ class Displayer(Canvas):
         self.y_max = y_max
 
         self.delete(ALL)
-        self.add_axis()
-        self.add_function(default_parser.parse(f).calculate)
+        self._update(default_parser.parse(f).calculate)
 
 
 class MainFrame:
