@@ -12,15 +12,17 @@ class Displayer(Canvas):
         self.x_max = x_max
         self.y_min = y_min
         self.y_max = y_max
-        super(Displayer, self).__init__(root, width=canvas_size+self.border // 2, height=canvas_size+self.border // 2, bg='white')
+        super(Displayer, self).__init__(root, width=canvas_size+self.border, height=canvas_size+self.border, bg='white')
 
     def _update(self, f, color='blue'):
-        x_axis_position = self.canvas_size // 2 + (self.y_max + self.y_min) / 2 * self.canvas_size / (self.y_max - self.y_min)
-        y_axis_position = self.canvas_size // 2 - (self.x_max + self.x_min) / 2 * self.canvas_size / (self.x_max - self.x_min)
+        x_axis_position = self.canvas_size // 2 + (self.y_max + self.y_min) / 2 * self.canvas_size / (self.y_max - self.y_min) + self.border // 2
+        y_axis_position = self.canvas_size // 2 - (self.x_max + self.x_min) / 2 * self.canvas_size / (self.x_max - self.x_min) + self.border // 2
 
-        self.y_axis = self.create_line(y_axis_position, self.canvas_size, y_axis_position, 0,
+        self.y_axis = self.create_line(y_axis_position, self.canvas_size + self.border // 2,
+                                       y_axis_position, self.border // 2,
                                        width=1, arrow=LAST, fill="gray")
-        self.x_axis = self.create_line(0, x_axis_position, self.canvas_size, x_axis_position,
+        self.x_axis = self.create_line(self.border // 2, x_axis_position,
+                                       self.canvas_size + self.border // 2, x_axis_position,
                                        width=1, arrow=LAST, fill="gray")
         # marking x_axis
         i = 0
@@ -41,10 +43,10 @@ class Displayer(Canvas):
             if x > self.canvas_size:
                 break
 
-            self.create_line(x, -2 + x_axis_position, x, 2+x_axis_position,
+            self.create_line(x + self.border // 2, -2 + x_axis_position, x + self.border // 2, 2+x_axis_position,
                              width=0.25, fill='gray')
 
-            self.create_text(x, 15+x_axis_position,
+            self.create_text(x + self.border // 2, 15+x_axis_position,
                              text=str(a / n), fill='black',
                              font=('Helvectica', '10'))
 
@@ -70,16 +72,17 @@ class Displayer(Canvas):
             if y < 0:
                 break
 
-            self.create_line(-2 + y_axis_position, y, 2 + y_axis_position, y,
+            self.create_line(-2 + y_axis_position, y + self.border // 2, 2 + y_axis_position, y + self.border // 2,
                              width=0.25, fill='gray')
 
-            self.create_text(15 + y_axis_position, y,
+            self.create_text(15 + y_axis_position, y + self.border // 2,
                              text=str(a / n), fill='black',
                              font=('Helvectica', '10'))
         previous_point = None
         for x in range(self.canvas_size + 1):
-            point = [x,  self.canvas_size - (self.canvas_size / (self.y_max - self.y_min) *
-                                             (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min))]
+            point = [x + self.border // 2,  self.canvas_size - (self.canvas_size / (self.y_max - self.y_min) *
+                                            (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min))
+                                            + self.border // 2]
             if math.isnan(point[1]):
                 previous_point = None
                 continue
