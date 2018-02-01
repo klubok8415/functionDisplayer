@@ -25,7 +25,12 @@ class Displayer(Canvas):
         # marking x_axis
         i = 0
         while True:
-            k = (self.x_max - self.x_min) // (self.canvas_size // 50)
+            n = 0
+
+            while (self.x_max - self.x_min)*10**(n-1) < 10:
+                n += 1
+
+            k = (self.x_max - self.x_min) * n // (self.canvas_size // 50)
 
             a = k * (i + self.x_min // k)
 
@@ -40,17 +45,20 @@ class Displayer(Canvas):
                              width=0.25, fill='gray')
 
             self.create_text(x, 15+x_axis_position,
-                             text=str(a), fill='black',
+                             text=str(a / n), fill='black',
                              font=('Helvectica', '10'))
 
         # marking y_axis
         i = 0
         while True:
-            k = (self.y_max - self.y_min) // (self.canvas_size // 50)
+            n = 0
 
+            while (self.y_max - self.y_min) * 10 ** (n - 1) < 10:
+                n += 1
+
+            k = (self.y_max - self.y_min)*n // (self.canvas_size // 50)
 
             a = k * (i + self.y_min // k)
-
 
             i += 1
 
@@ -66,7 +74,7 @@ class Displayer(Canvas):
                              width=0.25, fill='gray')
 
             self.create_text(15 + y_axis_position, y,
-                             text=str(a), fill='black',
+                             text=str(a / n), fill='black',
                              font=('Helvectica', '10'))
         previous_point = None
         for x in range(self.canvas_size + 1):
