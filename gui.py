@@ -18,6 +18,11 @@ class Displayer(Canvas):
         x_axis_position = self.canvas_size // 2 + (self.y_max + self.y_min) / 2 * self.canvas_size / (self.y_max - self.y_min) + self.border // 2
         y_axis_position = self.canvas_size // 2 - (self.x_max + self.x_min) / 2 * self.canvas_size / (self.x_max - self.x_min) + self.border // 2
 
+        if x_axis_position < self.border / 2:
+            x_axis_position = self.border / 2
+        if y_axis_position < self.border / 2:
+            y_axis_position = self.border / 2
+
         self.y_axis = self.create_line(y_axis_position, self.canvas_size + self.border // 2,
                                        y_axis_position, self.border // 2,
                                        width=1, arrow=LAST, fill="gray")
@@ -29,16 +34,16 @@ class Displayer(Canvas):
         while True:
             n = 0
 
-            while (self.x_max - self.x_min)*10**(n-1) < 10:
+            while (self.x_max - self.x_min) * (10 ** n) < 10:
                 n += 1
 
-            k = (self.x_max - self.x_min) * n // (self.canvas_size // 50)
+            k = (self.x_max - self.x_min) * (10 ** n) // (self.canvas_size // 50)
 
-            a = k * (i + self.x_min // k)
+            a = k * (i + self.x_min * (10 ** n) // k)
 
             i += 1
 
-            x = self.canvas_size*(1 - (1 - 1 / (self.x_max - self.x_min) * (a - self.x_min)))
+            x = self.canvas_size*(1 - (1 - 1 / ((self.x_max - self.x_min) * (10 ** n)) * (a - self.x_min * (10 ** n))))
 
             if x > self.canvas_size:
                 break
@@ -47,7 +52,7 @@ class Displayer(Canvas):
                              width=0.25, fill='gray')
 
             self.create_text(x + self.border // 2, 15+x_axis_position,
-                             text=str(a / n), fill='black',
+                             text=str(a / (10 ** n)), fill='black',
                              font=('Helvectica', '10'))
 
         # marking y_axis
@@ -55,19 +60,19 @@ class Displayer(Canvas):
         while True:
             n = 0
 
-            while (self.y_max - self.y_min) * 10 ** (n - 1) < 10:
+            while (self.y_max - self.y_min) * (10 ** n) < 10:
                 n += 1
 
-            k = (self.y_max - self.y_min)*n // (self.canvas_size // 50)
+            k = (self.y_max - self.y_min) * (10 ** n) // (self.canvas_size // 50)
 
-            a = k * (i + self.y_min // k)
+            a = k * (i + self.y_min * (10 ** n) // k)
 
             i += 1
 
             if a == 0:
                 continue
 
-            y = self.canvas_size * (1 - 1/(self.y_max - self.y_min) * (a - self.y_min))
+            y = self.canvas_size * (1 - 1 / ((self.y_max - self.y_min) * (10 ** n)) * (a - self.y_min * (10 ** n)) )
 
             if y < 0:
                 break
@@ -76,7 +81,7 @@ class Displayer(Canvas):
                              width=0.25, fill='gray')
 
             self.create_text(15 + y_axis_position, y + self.border // 2,
-                             text=str(a / n), fill='black',
+                             text=str(a / (10 ** n)), fill='black',
                              font=('Helvectica', '10'))
         previous_point = None
         for x in range(self.canvas_size + 1):
