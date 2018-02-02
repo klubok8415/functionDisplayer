@@ -83,18 +83,17 @@ class Displayer(Canvas):
             self.create_text(15 + y_axis_position, y + self.border // 2,
                              text=str(a / (10 ** n)), fill='black',
                              font=('Helvectica', '10'))
-        previous_point = None
-        for x in range(self.canvas_size + 1):
-            point = [x + self.border // 2,  self.canvas_size - (self.canvas_size / (self.y_max - self.y_min) *
+        pp = []
+        for x in range(self.canvas_size*50 + 1):
+            x /= 50
+            point = (x + self.border // 2,  self.canvas_size - (self.canvas_size / (self.y_max - self.y_min) *
                                             (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min))
-                                            + self.border // 2]
+                                            + self.border // 2)
             if math.isnan(point[1]):
-                previous_point = None
                 continue
 
-            if previous_point is not None:
-                self.create_line(previous_point, point, fill=color)
-            previous_point = point
+            pp.append(point)
+        self.create_line(pp, fill=color)
 
     def add_point(self, x, y, color="black"):
         self.create_oval(
