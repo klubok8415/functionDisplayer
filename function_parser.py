@@ -1,6 +1,6 @@
-import itertools
-
-from expressions import *
+from expressions.core import Function
+from expressions.simple_math import *
+from expressions.trigonometry import *
 
 
 class Prefix:

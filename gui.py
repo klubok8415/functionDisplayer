@@ -4,7 +4,7 @@ import math
 
 
 class Displayer(Canvas):
-    def __init__(self, root, x_min=0, x_max=0, y_min=0, y_max=0, canvas_size=500, border=20):
+    def __init__(self, root, x_min=0, x_max=0, y_min=0, y_max=0, canvas_size=500, border=50):
         self.root = root
         self.canvas_size = canvas_size
         self.border = border
