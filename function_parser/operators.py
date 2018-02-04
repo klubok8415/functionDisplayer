@@ -1,6 +1,5 @@
 from expressions.core import Function
-from expressions.simple_math import *
-from expressions.trigonometry import *
+from expressions.simple_math import Value
 
 
 class Prefix:
@@ -115,52 +114,3 @@ class Operator:
                 return Function.concat(args, self.operation)
         else:
             return None
-
-
-class Parser:
-    def __init__(self, operators, braces):
-        self.operators = braces + operators
-        self.braces_pairs = [(b.opening_character, b.closing_character) for b in braces]
-
-    def parse(self, string):
-        string = string.replace(" ", "")
-        try:
-            string = string.split("=")[1]
-        except IndexError:
-            raise Exception("Wrong format: '<function_name>=' is required")
-        return self._parse(string)
-
-    def _parse(self, string):
-        if string == "":
-            return None
-
-        for o in self.operators:
-            result = o.parse(string, self._parse, self.braces_pairs)
-
-            if result is not None:
-                return result
-        return None
-
-
-default_parser = Parser(
-    [
-        Operator("+", Addition),
-        Operator("-", Deduction),
-
-        Prefix("-", Inversion),
-
-        Operator("*", Multiplication),
-        Operator("/", Division),
-
-        Operator("^", Power),
-
-        FunctionOperator("sin", Sinus, 1),
-        FunctionOperator("log", Logarithm, 2),
-
-        VariableOperator,
-        ConstantOperator,
-    ],
-    [
-        Brace("(", ")"),
-        Brace("|", "|", operation=Modulus),
-    ])
