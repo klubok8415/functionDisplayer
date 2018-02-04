@@ -1,5 +1,5 @@
 from expressions.core import Function
-from expressions.simple_math import Value
+from expressions.math.simple import Value
 
 
 class Prefix:

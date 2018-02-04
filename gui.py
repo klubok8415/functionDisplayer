@@ -1,6 +1,8 @@
 from tkinter import *
-from function_parser import default_parser
+from function_parser import default
 import math
+
+from function_parser.default import default_parser
 
 
 class Displayer(Canvas):
