@@ -40,6 +40,6 @@ class MultiplicativeInversion(Power):
         super(MultiplicativeInversion, self).__init__([args[0], Value(-1)])
 
 
-class Division(MultiplicativeInversion):
+class Division(Multiplication):
     def __init__(self, args):
-        super(Division, self).__init__([Value(-1), args[0]])
+        super(Division, self).__init__([args[0], MultiplicativeInversion([args[1]])])
