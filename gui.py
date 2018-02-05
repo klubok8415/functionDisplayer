@@ -196,8 +196,12 @@ class MainFrame:
         self.y_max_entry = Entry(self.limitations_frame, width=10)
         self.y_max_entry.insert(0, '25')
         self.y_max_entry.bind('<Return>', self.rescale)
-        self.function_entry = Entry(self.handler_frame, width=20)
+
+        self.function_entry = Entry(self.handler_frame, width=20, foreground='grey')
         self.function_entry.bind('<Return>', self.on_click_add)
+        self.function_entry.insert(0, 'type your function hear')
+        self.function_entry.bind('<FocusOut>', self.change_entry_exit)
+        self.function_entry.bind('<FocusIn>', self.change_entry_enter)
 
         self.x_min_label = Label(self.limitations_frame, text='x min')
         self.x_max_label = Label(self.limitations_frame, text='x max')
@@ -205,6 +209,7 @@ class MainFrame:
         self.y_min_label = Label(self.limitations_frame, text='y min')
 
         self.function_entry.grid(row=0, column=0, columnspan=2)
+
         self.x_min_label.grid(row=0, column=0)
         self.x_max_label.grid(row=0, column=1)
         self.x_min_entry.grid(row=1, column=0)
@@ -213,7 +218,6 @@ class MainFrame:
         self.y_max_label.grid(row=2, column=1)
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
-        self.function_entry.insert(0, 'x')
 
         # Listbox
         self.functions_listbox = Listbox(self.listbox_frame)
@@ -265,9 +269,11 @@ class MainFrame:
 
         try:
             default_parser.parse(self.function_entry.get()).calculate
+
         except AttributeError:
             showerror(title='Parsing error', message='Wrong input format')
             return
+
         except OverflowError:
             showerror(title='Overflow error', message='Too long numbers')
 
@@ -280,6 +286,7 @@ class MainFrame:
         self.functions_listbox.delete('active')
 
     def on_click_change(self, event):
+        self.change_entry_enter(1)
         self.function_entry.delete(0, 'end')
         self.function_entry.insert(0, self.functions_listbox.get('active'))
         self.displayer.delete_function(self.functions_listbox.get('active'))
@@ -288,6 +295,18 @@ class MainFrame:
     def on_click_clear(self, event):
         self.functions_listbox.delete(0, 'end')
         self.displayer.clear()
+
+    def change_entry_exit(self, event):
+        if self.function_entry.get():
+            return
+        self.function_entry.delete(0, 'end')
+        self.function_entry.insert(0, 'type your function hear')
+        self.function_entry.config(foreground='grey')
+
+    def change_entry_enter(self, event):
+        if self.function_entry.get() == 'type your function hear':
+            self.function_entry.delete(0, 'end')
+        self.function_entry.config(foreground='black')
 
     def start(self):
         self.root.mainloop()
