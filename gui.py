@@ -234,11 +234,19 @@ class MainFrame:
         self.clear_but.grid(row=0, column=2)
 
     def rescale(self, event):
-        self.displayer.rescale(
-            int(self.x_min_entry.get()),
-            int(self.x_max_entry.get()),
-            int(self.y_min_entry.get()),
-            int(self.y_max_entry.get()))
+
+        try:
+            int(self.x_min_entry.get())
+            int(self.x_max_entry.get())
+            int(self.y_min_entry.get())
+            int(self.y_max_entry.get())
+        except ValueError:
+            showerror(title='Wrong input', message='Only numeric input is allowed')
+            return
+
+        if (int(self.x_max_entry.get()) - int(self.x_min_entry.get()) <= 0) or (
+                int(self.y_max_entry.get()) - int(self.y_min_entry.get()) <= 0):
+            showerror(title='Wrong input', message="It's impossible to draw graph in these limitations")
 
     def on_click_add(self, event):
         if self.function_entry.get() == '':
