@@ -22,5 +22,5 @@ class Logarithm(Operation):
 
 
 class Sqrt(Power):
-    def __init__(self, args):
-        super(Sqrt, self).__init__([args[0], Value(0.5)])
+    def __init__(self, *args):
+        super(Sqrt, self).__init__(args[0], Value(0.5))
