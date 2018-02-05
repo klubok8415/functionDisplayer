@@ -1,11 +1,14 @@
 from tkinter import *
+
+import numpy
+
 from function_parser import default
 import math
 
 from function_parser.default import default_parser
 
 
-class Displayer(Canvas):
+class Displayer(Ca nvas):
     def __init__(self, root, x_min=0, x_max=0, y_min=0, y_max=0, canvas_size=500, border=50):
         self.root = root
         self.canvas_size = canvas_size
@@ -90,6 +93,9 @@ class Displayer(Canvas):
                              text=str(a / (10 ** n)), fill='black',
                              font=('Helvectica', '10'))
         pp = []
+        prev_x = numpy.NaN
+        prev_y = numpy.NaN
+
         for x in range(self.canvas_size + 1):
             point = (
                 x + self.border // 2,
@@ -99,9 +105,20 @@ class Displayer(Canvas):
                 + self.border // 2)
 
             if math.isnan(point[1]):
+                self.create_line(pp, fill=color)
+                pp = []
                 continue
 
+            curr_y = round(point[1])
+            curr_x = round(point[0])
+
+            if curr_y == prev_y or curr_x == prev_x:
+                continue
+
+            prev_y = curr_y
+            prev_x = curr_x
             pp.append(point)
+
         self.create_line(pp, fill=color)
 
     def add_point(self, x, y, color="black"):
