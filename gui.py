@@ -1,5 +1,7 @@
 from tkinter import *
 
+from tkinter.messagebox import *
+
 import numpy
 
 import math
@@ -8,7 +10,7 @@ from function_parser.default import default_parser
 
 
 class Displayer(Canvas):
-    def __init__(self, root, x_min=-5, x_max=5, y_min=-25, y_max=25, canvas_size=500, border=50):
+    def __init__(self, root, x_min=-25, x_max=25, y_min=-25, y_max=25, canvas_size=500, border=50):
         self.root = root
         self.canvas_size = canvas_size
         self.border = border
@@ -182,10 +184,10 @@ class MainFrame:
 
         # Entries and labels below
         self.x_min_entry = Entry(self.limitations_frame, width=10)
-        self.x_min_entry.insert(0, '-5')
+        self.x_min_entry.insert(0, '-25')
         self.x_min_entry.bind('<Return>', self.rescale)
         self.x_max_entry = Entry(self.limitations_frame, width=10)
-        self.x_max_entry.insert(0, '5')
+        self.x_max_entry.insert(0, '25')
         self.x_max_entry.bind('<Return>', self.rescale)
         self.y_min_entry = Entry(self.limitations_frame, width=10)
         self.y_min_entry.insert(0, '-25')
@@ -210,7 +212,7 @@ class MainFrame:
         self.y_max_label.grid(row=2, column=1)
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
-        self.function_entry.insert(0, 'y=x')
+        self.function_entry.insert(0, 'x')
 
         # Listbox
         self.functions_listbox = Listbox(self.listbox_frame)
@@ -240,6 +242,18 @@ class MainFrame:
     def on_click_add(self, event):
         if self.function_entry.get() == '':
             return
+
+        if ',' in self.function_entry.get():
+            showwarning(title='Wrong format', message='Please, use "." instead of ","')
+            return
+
+        try:
+            default_parser.parse(self.function_entry.get()).calculate
+        except AttributeError:
+            showerror(title='Parsing error', message='Wrong input format')
+            return
+        except OverflowError:
+            showerror(title='Overflow error', message='Too long numbers')
 
         self.displayer.add_function(self.function_entry.get())
         self.functions_listbox.insert('end', self.function_entry.get())
