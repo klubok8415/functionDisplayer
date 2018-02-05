@@ -2,14 +2,13 @@ from tkinter import *
 
 import numpy
 
-from function_parser import default
 import math
 
 from function_parser.default import default_parser
 
 
 class Displayer(Canvas):
-    def __init__(self, root, x_min=0, x_max=0, y_min=0, y_max=0, canvas_size=500, border=50):
+    def __init__(self, root, x_min=-5, x_max=5, y_min=-25, y_max=25, canvas_size=500, border=20):
         self.root = root
         self.canvas_size = canvas_size
         self.border = border
@@ -17,10 +16,11 @@ class Displayer(Canvas):
         self.x_max = x_max
         self.y_min = y_min
         self.y_max = y_max
+        self.functions_list = []
         super(Displayer, self).__init__(root, width=canvas_size + self.border, height=canvas_size + self.border,
                                         bg='white')
 
-    def _update(self, f, color='blue'):
+    def _update(self, color='blue'):
         x_axis_position = self.canvas_size // 2 + (self.y_max + self.y_min) / 2 * self.canvas_size / (
         self.y_max - self.y_min) + self.border // 2
         y_axis_position = self.canvas_size // 2 - (self.x_max + self.x_min) / 2 * self.canvas_size / (
@@ -92,34 +92,42 @@ class Displayer(Canvas):
             self.create_text(15 + y_axis_position, y + self.border // 2,
                              text=str(a / (10 ** n)), fill='black',
                              font=('Helvectica', '10'))
-        pp = []
-        prev_x = numpy.NaN
-        prev_y = numpy.NaN
 
-        for x in range(self.canvas_size + 1):
-            point = (
-                x + self.border // 2,
-                self.canvas_size
-                - (self.canvas_size * (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min)
-                   / (self.y_max - self.y_min))
-                + self.border // 2)
+        if self.functions_list == []:
+            return
 
-            if math.isnan(point[1]):
-                self.create_line(pp, fill=color)
-                pp = []
-                continue
+        for f in self.functions_list:
 
-            curr_y = round(point[1])
-            curr_x = round(point[0])
+            f = default_parser.parse(f).calculate
+            pp = []
+            prev_x = numpy.NaN
+            prev_y = numpy.NaN
 
-            if curr_y == prev_y or curr_x == prev_x:
-                continue
+            for x in range(self.canvas_size + 1):
+                point = (
+                    x + self.border // 2,
+                    self.canvas_size
+                    - (self.canvas_size * (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min)
+                       / (self.y_max - self.y_min))
+                    + self.border // 2)
 
-            prev_y = curr_y
-            prev_x = curr_x
-            pp.append(point)
+                if math.isnan(point[1]):
+                    self.create_line(pp, fill=color)
+                    pp = []
+                    continue
 
-        self.create_line(pp, fill=color)
+                curr_y = round(point[1])
+                curr_x = round(point[0])
+
+                if curr_y == prev_y or curr_x == prev_x:
+                    continue
+
+                prev_y = curr_y
+                prev_x = curr_x
+                pp.append(point)
+
+            self.create_line(pp, fill=color)
+
 
     def add_point(self, x, y, color="black"):
         self.create_oval(
@@ -129,14 +137,28 @@ class Displayer(Canvas):
             self.canvas_size * y - 1,
             fill=color)
 
-    def rescale(self, f, x_min, x_max, y_min, y_max):
+    def rescale(self, x_min, x_max, y_min, y_max):
         self.x_max = x_max
         self.x_min = x_min
         self.y_min = y_min
         self.y_max = y_max
 
         self.delete(ALL)
-        self._update(default_parser.parse(f).calculate)
+        self._update()
+
+    def add_function(self, func):
+        self.functions_list.append(func)
+        self._update()
+
+    def delete_function(self, func):
+        self.functions_list.pop(self.functions_list.index(func))
+        self.delete(ALL)
+        self._update()
+
+    def clear(self):
+        self.functions_list = []
+        self.delete(ALL)
+        self._update()
 
 
 class MainFrame:
@@ -152,24 +174,25 @@ class MainFrame:
         # Entries and labels below
         self.x_min_entry = Entry(self.handler_frame, width=10)
         self.x_min_entry.insert(0, '-5')
-        self.x_min_entry.bind('<Return>', self.on_click)
+        self.x_min_entry.bind('<Return>', self.rescale)
         self.x_max_entry = Entry(self.handler_frame, width=10)
         self.x_max_entry.insert(0, '5')
-        self.x_max_entry.bind('<Return>', self.on_click)
+        self.x_max_entry.bind('<Return>', self.rescale)
         self.y_min_entry = Entry(self.handler_frame, width=10)
         self.y_min_entry.insert(0, '-25')
-        self.y_min_entry.bind('<Return>', self.on_click)
+        self.y_min_entry.bind('<Return>', self.rescale)
         self.y_max_entry = Entry(self.handler_frame, width=10)
         self.y_max_entry.insert(0, '25')
-        self.y_max_entry.bind('<Return>', self.on_click)
+        self.y_max_entry.bind('<Return>', self.rescale)
         self.function_entry = Entry(self.handler_frame, width=20)
-        self.function_entry.bind('<Return>', self.on_click)
+        self.function_entry.bind('<Return>', self.on_click_add)
 
         self.x_min_label = Label(self.handler_frame, text='x min')
         self.x_max_label = Label(self.handler_frame, text='x max')
         self.y_max_label = Label(self.handler_frame, text='y max')
         self.y_min_label = Label(self.handler_frame, text='y min')
-        self.function_label = Label(self.handler_frame, text='function input')
+        self.function_input_label = Label(self.handler_frame, text='function input')
+        self.functions_list_label = Label(self.handler_frame, text='functions displayed')
 
         self.x_min_label.grid(row=0, column=0)
         self.x_max_label.grid(row=0, column=1)
@@ -179,24 +202,62 @@ class MainFrame:
         self.y_max_label.grid(row=2, column=1)
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
-        self.function_label.grid(row=4, column=0, columnspan=2)
+        self.function_input_label.grid(row=4, column=0, columnspan=2)
         self.function_entry.grid(row=5, column=0, columnspan=2)
         self.function_entry.insert(0, 'y=x')
+        self.functions_list_label.grid(row=7, column=0, columnspan=2)
 
-        # handling button
-        self.rescale_but = Button(self.handler_frame, text='draw')
-        self.rescale_but.bind('<Button-1>', self.on_click)
-        self.rescale_but.grid(row=6, column=0, columnspan=2)
+        # Listbox
+        self.functions_listbox = Listbox(self.handler_frame)
+        self.functions_listbox.grid(row=8, column=0, columnspan=2)
 
-    def on_click(self, event):
-        if self.function_entry.get() == '':
-            return
+        # handling buttons
+        self.add_but = Button(self.handler_frame, text='add')
+        self.add_but.bind('<Button-1>', self.on_click_add)
+        self.add_but.grid(row=6, column=0, columnspan=2)
+
+        self.listbox_handler_frame = Frame(self.handler_frame)
+        self.listbox_handler_frame.grid(row=9, column=0, columnspan=2)
+
+        self.delete_but = Button(self.listbox_handler_frame, text='delete')
+        self.delete_but.bind('<Button-1>', self.on_click_delete)
+        self.delete_but.grid(row=0, column=0)
+
+        self.change_but = Button(self.listbox_handler_frame, text='change')
+        self.change_but.bind('<Button-1>', self.on_click_change)
+        self.change_but.grid(row=0, column=1)
+
+        self.clear_but = Button(self.listbox_handler_frame, text='clear')
+        self.clear_but.bind('<Button-1>', self.on_click_clear)
+        self.clear_but.grid(row=0, column=2)
+
+    def rescale(self, event):
         self.displayer.rescale(
-            self.function_entry.get(),
             int(self.x_min_entry.get()),
             int(self.x_max_entry.get()),
             int(self.y_min_entry.get()),
             int(self.y_max_entry.get()))
+
+    def on_click_add(self, event):
+        if self.function_entry.get() == '':
+            return
+
+        self.displayer.add_function(self.function_entry.get())
+        self.functions_listbox.insert('end', self.function_entry.get())
+
+    def on_click_delete(self, event):
+        self.displayer.delete_function(self.functions_listbox.get('active'))
+        self.functions_listbox.delete('active')
+
+    def on_click_change(self, event):
+        self.function_entry.delete(0, 'end')
+        self.function_entry.insert(0, self.functions_listbox.get('active'))
+        self.displayer.delete_function(self.functions_listbox.get('active'))
+        self.functions_listbox.delete('active')
+
+    def on_click_clear(self, event):
+        self.functions_listbox.delete(0, 'end')
+        self.displayer.clear()
 
     def start(self):
         self.root.mainloop()
