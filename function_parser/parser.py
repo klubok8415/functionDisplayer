@@ -5,10 +5,6 @@ class Parser:
 
     def parse(self, string):
         string = string.replace(" ", "")
-        try:
-            string = string.split("=")[1]
-        except IndexError:
-            raise Exception("Wrong format: '<function_name>=' is required")
         return self._parse(string)
 
     def _parse(self, string):

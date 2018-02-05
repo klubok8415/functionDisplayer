@@ -24,6 +24,8 @@ default_parser = Parser(
 
         FunctionOperator("log", Logarithm, 2),
 
+        FunctionOperator("sqrt", Sqrt, 1),
+
         VariableOperator,
         ConstantOperator,
     ],
