@@ -33,6 +33,41 @@ class Displayer(Canvas):
         if y_axis_position < self.border / 2:
             y_axis_position = self.border / 2
 
+        if self.functions_list:
+
+            for f in self.functions_list:
+
+                f = default_parser.parse(f).calculate
+                pp = []
+                prev_x = numpy.NaN
+                prev_y = numpy.NaN
+
+                for x in range(self.canvas_size + 1):
+                    point = (
+                        x + self.border // 2,
+                        self.canvas_size
+                        - (self.canvas_size * (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min)
+                           / (self.y_max - self.y_min))
+                        + self.border // 2)
+
+                    if math.isnan(point[1]):
+                        if len(pp) > 0:
+                            self.create_line(pp, fill=color)
+                        pp = []
+                        continue
+
+                    curr_y = round(point[1])
+                    curr_x = round(point[0])
+
+                    if curr_y == prev_y or curr_x == prev_x:
+                        continue
+
+                    prev_y = curr_y
+                    prev_x = curr_x
+                    pp.append(point)
+
+                self.create_line(pp, fill=color)
+
         self.y_axis = self.create_line(y_axis_position, self.canvas_size + self.border // 2,
                                        y_axis_position, self.border // 2,
                                        width=1, arrow=LAST, fill="gray")
@@ -95,41 +130,6 @@ class Displayer(Canvas):
                              text=str(a / (10 ** n)), fill='black',
                              font=('Helvectica', '10'))
 
-        if self.functions_list == []:
-            return
-
-        for f in self.functions_list:
-
-            f = default_parser.parse(f).calculate
-            pp = []
-            prev_x = numpy.NaN
-            prev_y = numpy.NaN
-
-            for x in range(self.canvas_size + 1):
-                point = (
-                    x + self.border // 2,
-                    self.canvas_size
-                    - (self.canvas_size * (f((self.x_max - self.x_min) / self.canvas_size * x + self.x_min) - self.y_min)
-                       / (self.y_max - self.y_min))
-                    + self.border // 2)
-
-                if math.isnan(point[1]):
-                    if len(pp) > 0:
-                        self.create_line(pp, fill=color)
-                    pp = []
-                    continue
-
-                curr_y = round(point[1])
-                curr_x = round(point[0])
-
-                if curr_y == prev_y or curr_x == prev_x:
-                    continue
-
-                prev_y = curr_y
-                prev_x = curr_x
-                pp.append(point)
-
-            self.create_line(pp, fill=color)
 
     def add_point(self, x, y, color="black"):
         self.create_oval(
@@ -220,7 +220,6 @@ class MainFrame:
         self.functions_listbox.pack()
 
         # handling buttons
-
         self.delete_but = Button(self.listbox_handler_frame, text='delete')
         self.delete_but.bind('<Button-1>', self.on_click_delete)
         self.delete_but.grid(row=0, column=0)
@@ -247,6 +246,14 @@ class MainFrame:
         if (int(self.x_max_entry.get()) - int(self.x_min_entry.get()) <= 0) or (
                 int(self.y_max_entry.get()) - int(self.y_min_entry.get()) <= 0):
             showerror(title='Wrong input', message="It's impossible to draw graph in these limitations")
+            return
+
+        self.displayer.rescale(
+            int(self.x_min_entry.get()),
+            int(self.x_max_entry.get()),
+            int(self.y_min_entry.get()),
+            int(self.y_max_entry.get())
+        )
 
     def on_click_add(self, event):
         if self.function_entry.get() == '':
