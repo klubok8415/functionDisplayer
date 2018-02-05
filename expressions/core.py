@@ -17,3 +17,9 @@ class Function:
 class Operation:
     def __init__(self, args):
         self.args = args
+
+    def calculate(self):
+        raise NotImplementedError()
+
+    def differentiate(self):
+        raise NotImplementedError()

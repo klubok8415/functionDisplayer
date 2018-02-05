@@ -1,37 +1,53 @@
 import math
 import numpy
 from expressions.core import Operation
+from expressions.math.powers import Power
 
 
-class Value:
-    def __init__(self, value):
-        self.value = value
-
+class Value(Operation):
     def calculate(self):
         return self.value
 
-
-class Inversion(Operation):
-    def calculate(self):
-        return -self.args[0].calculate()
+    def differentiate(self):
+        return Value(0)
 
 
 class Addition(Operation):
     def calculate(self):
         return sum(a.calculate() for a in self.args)
 
+    def differentiate(self):
+        return Value(0)
 
-class Deduction(Operation):
-    def calculate(self):
-        return self.args[0].calculate() - self.args[1].calculate()
+
+class Deduction(Addition):
+    def __init__(self, args):
+        super(Deduction, self).__init__([args[0], AdditiveInversion(args[1])])
 
 
 class Multiplication(Operation):
     def calculate(self):
         return self.args[0].calculate() * self.args[1].calculate()
 
+    def differentiate(self):
+        return Addition(
+            [
+                Multiplication([self.args[0], self.args[1].differentiate()]),
+                Multiplication([self.args[0].differentiate(), self.args[1]]),
+            ]
+        )
 
-class Division(Operation):
-    def calculate(self):
-        n = self.args[1].calculate()
-        return numpy.nan if n == 0 else self.args[0].calculate() / n
+
+class AdditiveInversion(Multiplication):
+    def __init__(self, args):
+        super(AdditiveInversion, self).__init__([Value(-1), args[0]])
+
+
+class MultiplicativeInversion(Power):
+    def __init__(self, args):
+        super(MultiplicativeInversion, self).__init__([args[0], Value(-1)])
+
+
+class Division(MultiplicativeInversion):
+    def __init__(self, args):
+        super(Division, self).__init__([Value(-1), args[0]])
