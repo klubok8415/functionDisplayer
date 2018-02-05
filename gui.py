@@ -112,7 +112,8 @@ class Displayer(Canvas):
                     + self.border // 2)
 
                 if math.isnan(point[1]):
-                    self.create_line(pp, fill=color)
+                    if len(pp) > 0:
+                        self.create_line(pp, fill=color)
                     pp = []
                     continue
 
@@ -210,7 +211,7 @@ class MainFrame:
         self.y_max_label.grid(row=2, column=1)
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
-        self.function_entry.insert(0, 'y=x')
+        self.function_entry.insert(0, 'x')
 
         # Listbox
         self.functions_listbox = Listbox(self.listbox_frame)

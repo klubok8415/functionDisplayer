@@ -1,15 +1,7 @@
 import math
 import numpy
-from expressions.core import Operation
+from expressions.core import Operation, Value
 from expressions.math.powers import Power
-
-
-class Value(Operation):
-    def calculate(self):
-        return self.value
-
-    def differentiate(self):
-        return Value(0)
 
 
 class Addition(Operation):
