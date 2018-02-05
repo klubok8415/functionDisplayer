@@ -5,7 +5,7 @@ class Function:
 
     @staticmethod
     def concat(functions, operation):
-        return Function(operation([f.expression for f in functions]), sum([f.variables for f in functions], []))
+        return Function(operation(*[f.expression for f in functions]), sum([f.variables for f in functions], []))
 
     def calculate(self, x):
         for var in self.variables:
@@ -15,7 +15,7 @@ class Function:
 
 
 class Operation:
-    def __init__(self, args):
+    def __init__(self, *args):
         self.args = args
 
     def calculate(self):
