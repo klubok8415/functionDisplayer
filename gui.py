@@ -8,7 +8,7 @@ from function_parser.default import default_parser
 
 
 class Displayer(Canvas):
-    def __init__(self, root, x_min=-5, x_max=5, y_min=-25, y_max=25, canvas_size=500, border=20):
+    def __init__(self, root, x_min=-5, x_max=5, y_min=-25, y_max=25, canvas_size=500, border=50):
         self.root = root
         self.canvas_size = canvas_size
         self.border = border
@@ -128,7 +128,6 @@ class Displayer(Canvas):
 
             self.create_line(pp, fill=color)
 
-
     def add_point(self, x, y, color="black"):
         self.create_oval(
             x - 1,
@@ -148,6 +147,7 @@ class Displayer(Canvas):
 
     def add_function(self, func):
         self.functions_list.append(func)
+        self.delete(ALL)
         self._update()
 
     def delete_function(self, func):
@@ -171,29 +171,37 @@ class MainFrame:
         self.handler_frame.grid(row=0, column=1)
         self.displayer.pack()
 
+        self.limitations_frame = Frame(self.handler_frame, pady=50)
+        self.limitations_frame.grid(row=3, column=0, columnspan=2)
+
+        self.listbox_handler_frame = Frame(self.handler_frame)
+        self.listbox_handler_frame.grid(row=2, column=0, columnspan=2)
+
+        self.listbox_frame = Frame(self.handler_frame, pady=10)
+        self.listbox_frame.grid(row=1, column=0, columnspan=2)
+
         # Entries and labels below
-        self.x_min_entry = Entry(self.handler_frame, width=10)
+        self.x_min_entry = Entry(self.limitations_frame, width=10)
         self.x_min_entry.insert(0, '-5')
         self.x_min_entry.bind('<Return>', self.rescale)
-        self.x_max_entry = Entry(self.handler_frame, width=10)
+        self.x_max_entry = Entry(self.limitations_frame, width=10)
         self.x_max_entry.insert(0, '5')
         self.x_max_entry.bind('<Return>', self.rescale)
-        self.y_min_entry = Entry(self.handler_frame, width=10)
+        self.y_min_entry = Entry(self.limitations_frame, width=10)
         self.y_min_entry.insert(0, '-25')
         self.y_min_entry.bind('<Return>', self.rescale)
-        self.y_max_entry = Entry(self.handler_frame, width=10)
+        self.y_max_entry = Entry(self.limitations_frame, width=10)
         self.y_max_entry.insert(0, '25')
         self.y_max_entry.bind('<Return>', self.rescale)
         self.function_entry = Entry(self.handler_frame, width=20)
         self.function_entry.bind('<Return>', self.on_click_add)
 
-        self.x_min_label = Label(self.handler_frame, text='x min')
-        self.x_max_label = Label(self.handler_frame, text='x max')
-        self.y_max_label = Label(self.handler_frame, text='y max')
-        self.y_min_label = Label(self.handler_frame, text='y min')
-        self.function_input_label = Label(self.handler_frame, text='function input')
-        self.functions_list_label = Label(self.handler_frame, text='functions displayed')
+        self.x_min_label = Label(self.limitations_frame, text='x min')
+        self.x_max_label = Label(self.limitations_frame, text='x max')
+        self.y_max_label = Label(self.limitations_frame, text='y max')
+        self.y_min_label = Label(self.limitations_frame, text='y min')
 
+        self.function_entry.grid(row=0, column=0, columnspan=2)
         self.x_min_label.grid(row=0, column=0)
         self.x_max_label.grid(row=0, column=1)
         self.x_min_entry.grid(row=1, column=0)
@@ -202,22 +210,13 @@ class MainFrame:
         self.y_max_label.grid(row=2, column=1)
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
-        self.function_input_label.grid(row=4, column=0, columnspan=2)
-        self.function_entry.grid(row=5, column=0, columnspan=2)
         self.function_entry.insert(0, 'y=x')
-        self.functions_list_label.grid(row=7, column=0, columnspan=2)
 
         # Listbox
-        self.functions_listbox = Listbox(self.handler_frame)
-        self.functions_listbox.grid(row=8, column=0, columnspan=2)
+        self.functions_listbox = Listbox(self.listbox_frame)
+        self.functions_listbox.pack()
 
         # handling buttons
-        self.add_but = Button(self.handler_frame, text='add')
-        self.add_but.bind('<Button-1>', self.on_click_add)
-        self.add_but.grid(row=6, column=0, columnspan=2)
-
-        self.listbox_handler_frame = Frame(self.handler_frame)
-        self.listbox_handler_frame.grid(row=9, column=0, columnspan=2)
 
         self.delete_but = Button(self.listbox_handler_frame, text='delete')
         self.delete_but.bind('<Button-1>', self.on_click_delete)
@@ -244,6 +243,7 @@ class MainFrame:
 
         self.displayer.add_function(self.function_entry.get())
         self.functions_listbox.insert('end', self.function_entry.get())
+        self.function_entry.delete(0, 'end')
 
     def on_click_delete(self, event):
         self.displayer.delete_function(self.functions_listbox.get('active'))
