@@ -2,8 +2,7 @@ import math
 
 import numpy
 
-from expressions.core import Operation
-from expressions.math.simple import Division, Value
+from expressions.core import Operation, Value
 
 
 class Power(Operation):

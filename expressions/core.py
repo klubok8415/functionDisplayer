@@ -17,3 +17,20 @@ class Function:
 class Operation:
     def __init__(self, args):
         self.args = args
+
+    def calculate(self):
+        raise NotImplementedError()
+
+    def differentiate(self):
+        raise NotImplementedError()
+
+
+class Value:
+    def __init__(self, value):
+        self.value = value
+
+    def calculate(self):
+        return self.value
+
+    def differentiate(self):
+        return Value(0)

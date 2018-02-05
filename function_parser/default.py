@@ -10,7 +10,7 @@ default_parser = Parser(
         Operator("+", Addition),
         Operator("-", Deduction),
 
-        Prefix("-", Inversion),
+        Prefix("-", AdditiveInversion),
 
         Operator("*", Multiplication),
         Operator("/", Division),

@@ -114,7 +114,8 @@ class Displayer(Canvas):
                     + self.border // 2)
 
                 if math.isnan(point[1]):
-                    self.create_line(pp, fill=color)
+                    if len(pp) > 0:
+                        self.create_line(pp, fill=color)
                     pp = []
                     continue
 
