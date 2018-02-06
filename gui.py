@@ -25,9 +25,9 @@ class Displayer(Canvas):
 
     def __update(self, color='blue'):
         x_axis_position = self.size_y // 2 + (self.y_max + self.y_min) / 2 * self.size_y / (
-        self.y_max - self.y_min) + self.border // 2
+            self.y_max - self.y_min) + self.border // 2
         y_axis_position = self.size_x // 2 - (self.x_max + self.x_min) / 2 * self.size_x / (
-        self.x_max - self.x_min) + self.border // 2
+            self.x_max - self.x_min) + self.border // 2
 
         if x_axis_position < self.border / 2:
             x_axis_position = self.border / 2
@@ -37,8 +37,7 @@ class Displayer(Canvas):
         if self.functions_list:
 
             for f in self.functions_list:
-
-                f = default_parser.parse(f).calculate
+                f = default_parser.parse(f).differentiate().calculate
                 pp = []
                 prev_x = numpy.NaN
                 prev_y = numpy.NaN

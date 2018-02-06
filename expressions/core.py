@@ -13,6 +13,9 @@ class Function:
 
         return self.expression.calculate()
 
+    def differentiate(self):
+        return Function(self.expression.differentiate(self.variables), self.variables)
+
 
 class Operation:
     def __init__(self, *args):
@@ -21,7 +24,7 @@ class Operation:
     def calculate(self):
         raise NotImplementedError()
 
-    def differentiate(self):
+    def differentiate(self, variables):
         raise NotImplementedError()
 
 
@@ -32,5 +35,5 @@ class Value:
     def calculate(self):
         return self.value
 
-    def differentiate(self):
-        return Value(0)
+    def differentiate(self, variables):
+        return Value(1 if self in variables else 0)
