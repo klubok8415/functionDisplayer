@@ -42,8 +42,7 @@ class Displayer(Canvas):
         if self.functions_list:
             for f in self.functions_list:
                 pp = []
-                prev_x = numpy.NaN
-                prev_y = numpy.NaN
+                prev_x, prev_y, curr_x, curr_y = [numpy.NaN] * 4
 
                 for x in range(self.size_x + 1):
                     point = (
@@ -55,22 +54,19 @@ class Displayer(Canvas):
 
                     if math.isnan(point[1]):
                         if len(pp) > 0:
-                            self.create_line(pp, fill=color)
+                            self.create_line(pp, fill=color, width=2)
                         pp = []
                         continue
 
                     curr_y = round(point[1])
                     curr_x = round(point[0])
 
-                    if curr_y == prev_y or curr_x == prev_x:
-                        continue
-
                     prev_y = curr_y
                     prev_x = curr_x
                     pp.append(point)
 
-                if len(pp) > 0:
-                    self.create_line(pp, fill=color)
+                if len(pp) > 1:
+                    self.create_line(pp, fill=color, width=2)
 
         self.y_axis = self.create_line(y_axis_position, self.size_y + self.border // 2,
                                        y_axis_position, self.border // 2,
@@ -153,9 +149,7 @@ class Displayer(Canvas):
 
     def add_function(self, func):
         try:
-            self.functions_list.append(self.parser.parse(func))
-            self.delete(ALL)
-            self.update_graph()
+            f = self.parser.parse(func)
 
         except AttributeError:
             showerror(title='Parsing error', message='Wrong input format')
@@ -163,6 +157,11 @@ class Displayer(Canvas):
 
         except OverflowError:
             showerror(title='Overflow error', message='Too long numbers')
+            return
+
+        self.functions_list.append(f)
+        self.delete(ALL)
+        self.update_graph()
 
     def add_derivative(self, index):
         self.functions_list.append(self.functions_list[index].differentiate())
