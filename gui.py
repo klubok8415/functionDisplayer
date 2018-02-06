@@ -329,6 +329,7 @@ class MainFrame:
         self.displayer.add_function(self.function_entry.get())
         self.functions_listbox.insert('end', self.function_entry.get())
         self.function_entry.delete(0, 'end')
+        self.mathmenu.entryconfig('Add derivative for active function', state='normal')
 
     def on_click_delete(self, event):
         self.displayer.delete_function(self.functions_listbox.index('active'))
@@ -363,7 +364,7 @@ class MainFrame:
         self.function_entry.config(foreground='grey')
 
     def change_entry_enter(self, event):
-        if self.function_entry.get() == 'type your function hear':
+        if self.function_entry.get() == 'type your function here':
             self.function_entry.delete(0, 'end')
         self.function_entry.config(foreground='black')
 
