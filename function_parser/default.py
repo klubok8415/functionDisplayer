@@ -1,5 +1,4 @@
 from expressions.math.other import *
-from expressions.math.powers import *
 from expressions.math.simple import *
 from expressions.math.trigonometry import *
 from function_parser.operators import *
