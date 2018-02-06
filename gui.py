@@ -177,6 +177,10 @@ class MainFrame:
         self.displayer.pack()
         self.root.update()
 
+        self.menubar = Menu(self.root)
+        self.helpmenu = Menu(self.menubar)
+
+
         self.limitations_frame = Frame(self.handler_frame, pady=50)
         self.limitations_frame.grid(row=3, column=0, columnspan=2)
 
