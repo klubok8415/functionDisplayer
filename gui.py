@@ -230,7 +230,7 @@ class MainFrame:
 
         self.function_entry = Entry(self.handler_frame, width=21, foreground='grey')
         self.function_entry.bind('<Return>', self.on_click_add_function)
-        self.function_entry.insert(0, 'type your function hear')
+        self.function_entry.insert(0, 'type your function here')
         self.function_entry.bind('<FocusOut>', self.change_entry_exit)
         self.function_entry.bind('<FocusIn>', self.change_entry_enter)
 
