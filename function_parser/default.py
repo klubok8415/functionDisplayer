@@ -6,15 +6,15 @@ from function_parser.parser import Parser
 
 default_parser = Parser(
     [
-        Operator("+", Addition),
-        Operator("-", Deduction),
+        InfixOperator("+", Addition),
+        InfixOperator("-", Deduction),
 
         Prefix("-", AdditiveInversion),
 
-        Operator("*", Multiplication),
-        Operator("/", Division),
+        InfixOperator("*", Multiplication),
+        InfixOperator("/", Division),
 
-        Operator("^", Power),
+        InfixOperator("^", Power),
 
         FunctionOperator("sin", Sinus, 1),
         FunctionOperator("cos", Cosine, 1),
@@ -30,8 +30,8 @@ default_parser = Parser(
 
         FunctionOperator("sqrt", Sqrt, 1),
 
-        VariableOperator,
-        ConstantOperator,
+        VariableOperator(),
+        ConstantOperator(),
     ],
     [
         Brace("(", ")"),

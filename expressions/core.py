@@ -4,8 +4,13 @@ class Function:
         self.variables = variables
 
     @staticmethod
-    def concat(functions, operation):
-        return Function(operation(*[f.expression for f in functions]), sum([f.variables for f in functions], []))
+    def concat(functions, operation, new_variables=None):
+        if new_variables is None:
+            new_variables = []
+
+        return Function(
+            operation(*[f.expression for f in functions]),
+            sum([f.variables for f in functions], new_variables))
 
     def calculate(self, x):
         for var in self.variables:
@@ -37,3 +42,6 @@ class Value:
 
     def differentiate(self, variables):
         return Value(1 if self in variables else 0)
+
+    def __call__(self, *args):
+        return self
