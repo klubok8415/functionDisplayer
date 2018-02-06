@@ -158,6 +158,11 @@ class Displayer(Canvas):
         self.delete(ALL)
         self.update_graph()
 
+    def add_derivative(self, func):
+        self.functions_list.append(self.parser.parse(func).differentiate().calculate)
+        self.delete(ALL)
+        self.update_graph()
+
     def delete_function(self, index):
         self.functions_list.pop(index)
         self.delete(ALL)
@@ -185,6 +190,7 @@ class MainFrame:
         self.menubar = Menu(self.root)
 
         self.mathmenu = Menu(self.menubar)
+        self.mathmenu.add_command(label='Add deritive for active function', command=self.on_click_add_derivative)
         self.menubar.add_cascade(label='Math', menu=self.mathmenu)
 
         self.helpmenu = Menu(self.menubar)
@@ -217,7 +223,7 @@ class MainFrame:
         self.y_max_entry.bind('<Return>', self.rescale)
 
         self.function_entry = Entry(self.handler_frame, width=20, foreground='grey')
-        self.function_entry.bind('<Return>', self.on_click_add)
+        self.function_entry.bind('<Return>', self.on_click_add_function)
         self.function_entry.insert(0, 'type your function hear')
         self.function_entry.bind('<FocusOut>', self.change_entry_exit)
         self.function_entry.bind('<FocusIn>', self.change_entry_enter)
@@ -297,7 +303,11 @@ class MainFrame:
             int(self.y_max_entry.get())
         )
 
-    def on_click_add(self, event):
+    def on_click_add_derivative(self):
+        self.displayer.add_derivative(self.functions_listbox.get('active'))
+        self.functions_listbox.insert('end', '('+self.functions_listbox.get('active')+")'")
+
+    def on_click_add_function(self, event):
         if self.function_entry.get() == '':
             return
 
@@ -324,6 +334,9 @@ class MainFrame:
         self.functions_listbox.delete('active')
 
     def on_click_change(self, event):
+        if self.functions_listbox.get('active')[-1] == "'":
+            showwarning(title='Warning', message='Impossible to change derivative')
+            return
         # deleting background text in function entry
         self.change_entry_enter(1)
         self.function_entry.delete(0, 'end')
