@@ -360,7 +360,7 @@ class MainFrame:
         if self.function_entry.get():
             return
         self.function_entry.delete(0, 'end')
-        self.function_entry.insert(0, 'type your function hear')
+        self.function_entry.insert(0, 'type your function here')
         self.function_entry.config(foreground='grey')
 
     def change_entry_enter(self, event):
