@@ -187,10 +187,12 @@ class MainFrame:
 
         self.displayer.pack()
 
+        # menu bar
         self.menubar = Menu(self.root)
 
         self.mathmenu = Menu(self.menubar)
-        self.mathmenu.add_command(label='Add deritive for active function', command=self.on_click_add_derivative)
+        self.mathmenu.add_command(label='Add derivative for active function',
+                                  state='disabled').bind('<Button-1>', self.on_click_add_derivative)
         self.menubar.add_cascade(label='Math', menu=self.mathmenu)
 
         self.helpmenu = Menu(self.menubar)
@@ -198,6 +200,7 @@ class MainFrame:
         self.menubar.add_cascade(label='Help', menu=self.helpmenu)
 
         self.root.config(menu=self.menubar)
+
 
         self.limitations_frame = Frame(self.handler_frame, pady=50)
         self.limitations_frame.grid(row=3, column=0, columnspan=2)
@@ -222,7 +225,7 @@ class MainFrame:
         self.y_max_entry.insert(0, '25')
         self.y_max_entry.bind('<Return>', self.rescale)
 
-        self.function_entry = Entry(self.handler_frame, width=20, foreground='grey')
+        self.function_entry = Entry(self.handler_frame, width=21, foreground='grey')
         self.function_entry.bind('<Return>', self.on_click_add_function)
         self.function_entry.insert(0, 'type your function hear')
         self.function_entry.bind('<FocusOut>', self.change_entry_exit)
@@ -245,8 +248,12 @@ class MainFrame:
         self.y_max_entry.grid(row=3, column=1)
 
         # Listbox
-        self.functions_listbox = Listbox(self.listbox_frame)
-        self.functions_listbox.pack()
+        self.listbox_scrollbar = Scrollbar(self.listbox_frame, orient=VERTICAL)
+        self.functions_listbox = Listbox(self.listbox_frame, yscrollcommand=self.listbox_scrollbar.set)
+        self.listbox_scrollbar.config(command=self.functions_listbox.yview)
+        self.listbox_scrollbar.pack(side=RIGHT, fill=Y)
+        self.functions_listbox.pack(side=LEFT, fill=BOTH)
+
 
         # handling buttons
         self.delete_but = Button(self.listbox_handler_frame, text='delete')
@@ -266,6 +273,11 @@ class MainFrame:
         self.size_x_prev = self.root.winfo_width()
         self.size_y_prev = self.root.winfo_height()
         self.root.bind('<Configure>', self.root_resize)
+
+        # Hot keys
+        self.root.bind('<Delete>', self.on_click_delete)
+        self.root.bind('<F2>', self.on_click_change)
+        self.functions_listbox.bind('<Return>', self.on_click_add_derivative)
 
     def root_resize(self, event):
         delta_x = self.root.winfo_width() - self.size_x_prev
@@ -303,7 +315,7 @@ class MainFrame:
             int(self.y_max_entry.get())
         )
 
-    def on_click_add_derivative(self):
+    def on_click_add_derivative(self, event):
         self.displayer.add_derivative(self.functions_listbox.get('active'))
         self.functions_listbox.insert('end', '('+self.functions_listbox.get('active')+")'")
 
@@ -324,7 +336,8 @@ class MainFrame:
 
         except OverflowError:
             showerror(title='Overflow error', message='Too long numbers')
-
+        if self.functions_listbox.index('end') == 0:
+            self.mathmenu.entryconfig('Add derivative for active function', state='normal')
         self.displayer.add_function(self.function_entry.get())
         self.functions_listbox.insert('end', self.function_entry.get())
         self.function_entry.delete(0, 'end')
@@ -332,6 +345,8 @@ class MainFrame:
     def on_click_delete(self, event):
         self.displayer.delete_function(self.functions_listbox.index('active'))
         self.functions_listbox.delete('active')
+        if self.functions_listbox.index('end') == 0:
+            self.mathmenu.entryconfig('Add derivative for active function', state='disabled')
 
     def on_click_change(self, event):
         if self.functions_listbox.get('active')[-1] == "'":
@@ -348,6 +363,7 @@ class MainFrame:
     def on_click_clear(self, event):
         self.functions_listbox.delete(0, 'end')
         self.displayer.clear()
+        self.mathmenu.entryconfig('Add derivative for active function', state='disabled')
 
     # methods below create background text in function entrybox
 
