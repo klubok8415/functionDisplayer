@@ -40,9 +40,7 @@ class Displayer(Canvas):
             y_axis_position = self.size_y + self.border / 2
 
         if self.functions_list:
-
             for f in self.functions_list:
-
                 pp = []
                 prev_x = numpy.NaN
                 prev_y = numpy.NaN
@@ -51,7 +49,7 @@ class Displayer(Canvas):
                     point = (
                         x + self.border // 2,
                         self.size_y
-                        - (self.size_y * (f((self.x_max - self.x_min) / self.size_x * x + self.x_min) - self.y_min)
+                        - (self.size_y * (f.calculate((self.x_max - self.x_min) / self.size_x * x + self.x_min) - self.y_min)
                            / (self.y_max - self.y_min))
                         + self.border // 2)
 
@@ -154,12 +152,20 @@ class Displayer(Canvas):
         self.update_graph()
 
     def add_function(self, func):
-        self.functions_list.append(self.parser.parse(func).calculate)
-        self.delete(ALL)
-        self.update_graph()
+        try:
+            self.functions_list.append(self.parser.parse(func))
+            self.delete(ALL)
+            self.update_graph()
 
-    def add_derivative(self, func):
-        self.functions_list.append(self.parser.parse(func).differentiate().calculate)
+        except AttributeError:
+            showerror(title='Parsing error', message='Wrong input format')
+            return
+
+        except OverflowError:
+            showerror(title='Overflow error', message='Too long numbers')
+
+    def add_derivative(self, index):
+        self.functions_list.append(self.functions_list[index].differentiate())
         self.delete(ALL)
         self.update_graph()
 
@@ -190,7 +196,7 @@ class MainFrame:
         self.menubar = Menu(self.root)
 
         self.mathmenu = Menu(self.menubar)
-        self.mathmenu.add_command(label='Add deritive for active function', command=self.on_click_add_derivative)
+        self.mathmenu.add_command(label='Add derivative for active function', command=self.on_click_add_derivative)
         self.menubar.add_cascade(label='Math', menu=self.mathmenu)
 
         self.helpmenu = Menu(self.menubar)
@@ -304,26 +310,12 @@ class MainFrame:
         )
 
     def on_click_add_derivative(self):
-        self.displayer.add_derivative(self.functions_listbox.get('active'))
+        self.displayer.add_derivative(self.functions_listbox.index('active'))
         self.functions_listbox.insert('end', '('+self.functions_listbox.get('active')+")'")
 
     def on_click_add_function(self, event):
         if self.function_entry.get() == '':
             return
-
-        if ',' in self.function_entry.get():
-            showwarning(title='Wrong format', message='Please, use "." instead of ","')
-            return
-
-        try:
-            default_parser.parse(self.function_entry.get()).calculate
-
-        except AttributeError:
-            showerror(title='Parsing error', message='Wrong input format')
-            return
-
-        except OverflowError:
-            showerror(title='Overflow error', message='Too long numbers')
 
         self.displayer.add_function(self.function_entry.get())
         self.functions_listbox.insert('end', self.function_entry.get())
