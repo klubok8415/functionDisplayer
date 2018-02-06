@@ -37,7 +37,7 @@ class Displayer(Canvas):
         if self.functions_list:
 
             for f in self.functions_list:
-                f = default_parser.parse(f).differentiate().calculate
+                f = default_parser.parse(f).calculate
                 pp = []
                 prev_x = numpy.NaN
                 prev_y = numpy.NaN

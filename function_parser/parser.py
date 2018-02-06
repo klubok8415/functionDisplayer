@@ -1,3 +1,13 @@
+from expressions.core import Function
+
+
+class ParsingData:
+    def __init__(self, operation, arguments, new_variables):
+        self.operation = operation
+        self.arguments = arguments
+        self.new_variables = new_variables
+
+
 class Parser:
     def __init__(self, operators, braces):
         self.operators = braces + operators
@@ -12,8 +22,15 @@ class Parser:
             return None
 
         for o in self.operators:
-            result = o.parse(string, self._parse, self.braces_pairs)
+            result = o.parse(string, self.braces_pairs)
 
             if result is not None:
-                return result
+                args = [self._parse(a) for a in result.arguments]
+
+                if any(a is None for a in args):
+                    continue
+
+                return args[0] \
+                    if result.operation is None \
+                    else Function.concat(args, result.operation, result.new_variables)
         return None
