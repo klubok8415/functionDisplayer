@@ -34,6 +34,10 @@ class Displayer(Canvas):
             x_axis_position = self.border / 2
         if y_axis_position < self.border / 2:
             y_axis_position = self.border / 2
+        if x_axis_position > self.size_x + self.border / 2:
+            x_axis_position = self.size_x + self.border / 2
+        if y_axis_position > self.size_y + self.border / 2:
+            y_axis_position = self.size_y + self.border / 2
 
         if self.functions_list:
 
@@ -150,7 +154,7 @@ class Displayer(Canvas):
         self.update_graph()
 
     def add_function(self, func):
-        self.functions_list.append(self.parser.parse(func).differentiate().calculate)
+        self.functions_list.append(self.parser.parse(func).calculate)
         self.delete(ALL)
         self.update_graph()
 
