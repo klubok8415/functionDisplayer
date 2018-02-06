@@ -20,6 +20,7 @@ class Displayer(Canvas):
         self.y_min = y_min
         self.y_max = y_max
         self.functions_list = []
+        self.parser = default_parser
         super(Displayer, self).__init__(self.root, width=self.size_x + self.border, height=self.size_y + self.border,
                                         bg='white')
 
@@ -37,7 +38,7 @@ class Displayer(Canvas):
         if self.functions_list:
 
             for f in self.functions_list:
-                f = default_parser.parse(f).calculate
+
                 pp = []
                 prev_x = numpy.NaN
                 prev_y = numpy.NaN
@@ -149,12 +150,12 @@ class Displayer(Canvas):
         self.update_graph()
 
     def add_function(self, func):
-        self.functions_list.append(func)
+        self.functions_list.append(self.parser.parse(func).differentiate().calculate)
         self.delete(ALL)
         self.update_graph()
 
-    def delete_function(self, func):
-        self.functions_list.pop(self.functions_list.index(func))
+    def delete_function(self, index):
+        self.functions_list.pop(index)
         self.delete(ALL)
         self.update_graph()
 
@@ -315,14 +316,16 @@ class MainFrame:
         self.function_entry.delete(0, 'end')
 
     def on_click_delete(self, event):
-        self.displayer.delete_function(self.functions_listbox.get('active'))
+        self.displayer.delete_function(self.functions_listbox.index('active'))
         self.functions_listbox.delete('active')
 
     def on_click_change(self, event):
+        # deleting background text in function entry
         self.change_entry_enter(1)
         self.function_entry.delete(0, 'end')
+
         self.function_entry.insert(0, self.functions_listbox.get('active'))
-        self.displayer.delete_function(self.functions_listbox.get('active'))
+        self.displayer.delete_function(self.functions_listbox.index('active'))
         self.functions_listbox.delete('active')
 
     def on_click_clear(self, event):
