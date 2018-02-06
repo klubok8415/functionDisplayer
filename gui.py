@@ -81,10 +81,10 @@ class Displayer(Canvas):
         while True:
             n = 0
 
-            while (self.x_max - self.x_min) * (10 ** n) < 10:
+            while (self.x_max - self.x_min) * (10 ** n) < self.size_x // 50:
                 n += 1
 
-            k = (self.x_max - self.x_min) * (10 ** n) // 10
+            k = (self.x_max - self.x_min) * (10 ** n) // (self.size_x // 50)
 
             a = k * (i + self.x_min * (10 ** n) // k)
 
@@ -108,10 +108,10 @@ class Displayer(Canvas):
         while True:
             n = 0
 
-            while (self.y_max - self.y_min) * (10 ** n) < 10:
+            while (self.y_max - self.y_min) * (10 ** n) < self.size_y // 50:
                 n += 1
 
-            k = (self.y_max - self.y_min) * (10 ** n) // 10
+            k = (self.y_max - self.y_min) * (10 ** n) // (self.size_y // 50)
 
             a = k * (i + self.y_min * (10 ** n) // k)
 
