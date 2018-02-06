@@ -23,7 +23,7 @@ class Displayer(Canvas):
         super(Displayer, self).__init__(self.root, width=self.size_x + self.border, height=self.size_y + self.border,
                                         bg='white')
 
-    def __update(self, color='blue'):
+    def update_graph(self, color='blue'):
         x_axis_position = self.size_y // 2 + (self.y_max + self.y_min) / 2 * self.size_y / (
         self.y_max - self.y_min) + self.border // 2
         y_axis_position = self.size_x // 2 - (self.x_max + self.x_min) / 2 * self.size_x / (
@@ -84,7 +84,7 @@ class Displayer(Canvas):
             while (self.x_max - self.x_min) * (10 ** n) < 10:
                 n += 1
 
-            k = (self.x_max - self.x_min) * (10 ** n) // (self.size_x // 50)
+            k = (self.x_max - self.x_min) * (10 ** n) // 10
 
             a = k * (i + self.x_min * (10 ** n) // k)
 
@@ -111,7 +111,7 @@ class Displayer(Canvas):
             while (self.y_max - self.y_min) * (10 ** n) < 10:
                 n += 1
 
-            k = (self.y_max - self.y_min) * (10 ** n) // (self.size_y // 50)
+            k = (self.y_max - self.y_min) * (10 ** n) // 10
 
             a = k * (i + self.y_min * (10 ** n) // k)
 
@@ -148,34 +148,34 @@ class Displayer(Canvas):
         self.y_max = y_max
 
         self.delete(ALL)
-        self.__update()
+        self.update_graph()
 
     def add_function(self, func):
         self.functions_list.append(func)
         self.delete(ALL)
-        self.__update()
+        self.update_graph()
 
     def delete_function(self, func):
         self.functions_list.pop(self.functions_list.index(func))
         self.delete(ALL)
-        self.__update()
+        self.update_graph()
 
     def clear(self):
         self.functions_list = []
         self.delete(ALL)
-        self.__update()
+        self.update_graph()
 
 
 class MainFrame:
     def __init__(self):
         self.root = Tk()
-        self.root.bind('<Configure>', self.root_resize)
         self.canvas_frame = Frame(self.root)
         self.handler_frame = Frame(self.root, padx=20)
         self.displayer = Displayer(self.canvas_frame)
         self.canvas_frame.pack(side=LEFT, fill=X, expand=1)
         self.handler_frame.pack(side=LEFT, fill=X)
         self.displayer.pack()
+        self.root.update()
 
         self.limitations_frame = Frame(self.handler_frame, pady=50)
         self.limitations_frame.grid(row=3, column=0, columnspan=2)
@@ -241,16 +241,22 @@ class MainFrame:
 
         self.root.update()
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
-        print(self.root.winfo_width(), self.root.winfo_height())
+        self.size_x_prev = self.root.winfo_width()
+        self.size_y_prev = self.root.winfo_height()
+        self.root.bind('<Configure>', self.root_resize)
 
     def root_resize(self, event):
-        pass
-
-        # self.root.update()
-        # self.displayer.destroy()
-        # self.displayer = Displayer(self.root, size_x=int(self.root.winfo_width()) - 300,
-        #                            size_y=int(self.root.winfo_height()) - 56)
-        # self.displayer.update()
+        delta_x = self.root.winfo_width() - self.size_x_prev
+        delta_y = self.root.winfo_height() - self.size_y_prev
+        if delta_x != 0 or delta_y != 0:
+            self.displayer.size_x += delta_x
+            self.displayer.size_y += delta_y
+            self.displayer.config(width=self.displayer.size_x + self.displayer.border,
+                                  height=self.displayer.size_y + self.displayer.border)
+            self.displayer.delete(ALL)
+            self.displayer.update_graph()
+            self.size_x_prev += delta_x
+            self.size_y_prev += delta_y
 
     def rescale(self, event):
 
