@@ -95,7 +95,7 @@ class Displayer(Canvas):
             i += 1
 
             x = self.size_x * (
-            1 - (1 - 1 / ((self.x_max - self.x_min) * (10 ** n)) * (a - self.x_min * (10 ** n))))
+                1 - (1 - 1 / ((self.x_max - self.x_min) * (10 ** n)) * (a - self.x_min * (10 ** n))))
 
             if x > self.size_x:
                 break
@@ -286,7 +286,7 @@ class MainFrame:
             return
 
         if (int(self.x_max_entry.get()) - int(self.x_min_entry.get()) <= 0) or (
-                int(self.y_max_entry.get()) - int(self.y_min_entry.get()) <= 0):
+                        int(self.y_max_entry.get()) - int(self.y_min_entry.get()) <= 0):
             showerror(title='Wrong input', message="It's impossible to draw graph in these limitations")
             return
 
@@ -351,28 +351,30 @@ class MainFrame:
         self.function_entry.config(foreground='black')
 
     def help_message(self):
-        showinfo(title='Help', message='Available operators: '
-                                       '\n "+" - Addition  '
-                                       '\n "-" - Deduction '
-                                       '\n "*" - Multiplication'
-                                       '\n "/" - Division'
-                                       '\n "ˆ" - Power'
-                                       '\n "sin(argument)" - Sinus'
-                                       '\n "cos(argument)" - Cosine'
-                                       '\n "tan(argument)" - Tangent'
-                                       '\n "cot(argument)" - Cotangent'
-                                       '\n "arcsin(argument)" - Arcsine'
-                                       '\n "arccos(argument)" - Arccosine'
-                                       '\n "acrtan(argument)" - Arctangent'
-                                       '\n "arccot(argument)" - Arccotangent'
-                                       '\n "log(argument, base)" - Logarithm'
-                                       '\n "sqrt(argument)" - Square root'
-                                       '\n'
-                                       '\n Other designations:'
-                                       '\n "()" - Brackets'
-                                       '\n "||" - Modulus'
-                                       '\n "[]" - Floor'
-                                       '\n "{}" - Truncate')
+        showinfo(
+            title='Help',
+            message='Available operators: '
+                    '\n "+" - Addition  '
+                    '\n "-" - Deduction '
+                    '\n "*" - Multiplication'
+                    '\n "/" - Division'
+                    '\n "ˆ" - Power'
+                    '\n "sin(argument)" - Sinus'
+                    '\n "cos(argument)" - Cosine'
+                    '\n "tan(argument)" - Tangent'
+                    '\n "cot(argument)" - Cotangent'
+                    '\n "arcsin(argument)" - Arcsine'
+                    '\n "arccos(argument)" - Arccosine'
+                    '\n "acrtan(argument)" - Arctangent'
+                    '\n "arccot(argument)" - Arccotangent'
+                    '\n "log(argument, base)" - Logarithm'
+                    '\n "sqrt(argument)" - Square root'
+                    '\n'
+                    '\n Other designations:'
+                    '\n "()" - Brackets'
+                    '\n "||" - Modulus'
+                    '\n "[]" - Floor'
+                    '\n "{}" - Truncate')
 
     def start(self):
         self.root.mainloop()

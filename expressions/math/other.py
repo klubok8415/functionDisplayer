@@ -16,4 +16,4 @@ class Floor(Operation):
 
 class Truncate(Deduction):
     def __init__(self, *args):
-        super(Truncate, self).__init__(args[0], Floor([args[0]]))
+        super(Truncate, self).__init__(args[0], Floor(args[0]))
