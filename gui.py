@@ -131,7 +131,6 @@ class Displayer(Canvas):
                              text=str(a / (10 ** n)), fill='black',
                              font=('Helvectica', '10'))
 
-
     def add_point(self, x, y, color="black"):
         self.create_oval(
             x - 1,
@@ -170,11 +169,24 @@ class MainFrame:
         self.root = Tk()
         self.canvas_frame = Frame(self.root)
         self.handler_frame = Frame(self.root, padx=20)
+
         self.displayer = Displayer(self.canvas_frame)
+
         self.canvas_frame.pack(side=LEFT, fill=X, expand=1)
         self.handler_frame.pack(side=LEFT, fill=X)
+
         self.displayer.pack()
-        self.root.update()
+
+        self.menubar = Menu(self.root)
+
+        self.mathmenu = Menu(self.menubar)
+        self.menubar.add_cascade(label='Math', menu=self.mathmenu)
+
+        self.helpmenu = Menu(self.menubar)
+        self.helpmenu.add_command(label='Help', command=self.help_message)
+        self.menubar.add_cascade(label='Help', menu=self.helpmenu)
+
+        self.root.config(menu=self.menubar)
 
         self.limitations_frame = Frame(self.handler_frame, pady=50)
         self.limitations_frame.grid(row=3, column=0, columnspan=2)
@@ -330,6 +342,30 @@ class MainFrame:
         if self.function_entry.get() == 'type your function hear':
             self.function_entry.delete(0, 'end')
         self.function_entry.config(foreground='black')
+
+    def help_message(self):
+        showinfo(title='Help', message='Available operators: '
+                                       '\n "+" - Addition  '
+                                       '\n "-" - Deduction '
+                                       '\n "*" - Multiplication'
+                                       '\n "/" - Division'
+                                       '\n "ˆ" - Power'
+                                       '\n "sin(argument)" - Sinus'
+                                       '\n "cos(argument)" - Cosine'
+                                       '\n "tan(argument)" - Tangent'
+                                       '\n "cot(argument)" - Cotangent'
+                                       '\n "arcsin(argument)" - Arcsine'
+                                       '\n "arccos(argument)" - Arccosine'
+                                       '\n "acrtan(argument)" - Arctangent'
+                                       '\n "arccot(argument)" - Arccotangent'
+                                       '\n "log(argument, base)" - Logarithm'
+                                       '\n "sqrt(argument)" - Square root'
+                                       '\n'
+                                       '\n Other designations:'
+                                       '\n "()" - Brackets'
+                                       '\n "||" - Modulus'
+                                       '\n "[]" - Floor'
+                                       '\n "{}" - Truncate')
 
     def start(self):
         self.root.mainloop()
