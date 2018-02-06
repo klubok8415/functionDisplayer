@@ -40,39 +40,33 @@ class Displayer(Canvas):
             y_axis_position = self.size_y + self.border / 2
 
         if self.functions_list:
-
             for f in self.functions_list:
-
                 pp = []
-                prev_x = numpy.NaN
-                prev_y = numpy.NaN
+                prev_x, prev_y, curr_x, curr_y = [numpy.NaN] * 4
 
                 for x in range(self.size_x + 1):
                     point = (
                         x + self.border // 2,
                         self.size_y
-                        - (self.size_y * (f((self.x_max - self.x_min) / self.size_x * x + self.x_min) - self.y_min)
+                        - (self.size_y * (f.calculate((self.x_max - self.x_min) / self.size_x * x + self.x_min) - self.y_min)
                            / (self.y_max - self.y_min))
                         + self.border // 2)
 
                     if math.isnan(point[1]):
                         if len(pp) > 0:
-                            self.create_line(pp, fill=color)
+                            self.create_line(pp, fill=color, width=2)
                         pp = []
                         continue
 
                     curr_y = round(point[1])
                     curr_x = round(point[0])
 
-                    if curr_y == prev_y or curr_x == prev_x:
-                        continue
-
                     prev_y = curr_y
                     prev_x = curr_x
                     pp.append(point)
 
-                if len(pp) > 0:
-                    self.create_line(pp, fill=color)
+                if len(pp) > 1:
+                    self.create_line(pp, fill=color, width=2)
 
         self.y_axis = self.create_line(y_axis_position, self.size_y + self.border // 2,
                                        y_axis_position, self.border // 2,
@@ -154,12 +148,23 @@ class Displayer(Canvas):
         self.update_graph()
 
     def add_function(self, func):
-        self.functions_list.append(self.parser.parse(func).calculate)
+        try:
+            f = self.parser.parse(func)
+
+        except AttributeError:
+            showerror(title='Parsing error', message='Wrong input format')
+            return
+
+        except OverflowError:
+            showerror(title='Overflow error', message='Too long numbers')
+            return
+
+        self.functions_list.append(f)
         self.delete(ALL)
         self.update_graph()
 
-    def add_derivative(self, func):
-        self.functions_list.append(self.parser.parse(func).differentiate().calculate)
+    def add_derivative(self, index):
+        self.functions_list.append(self.functions_list[index].differentiate())
         self.delete(ALL)
         self.update_graph()
 
@@ -191,8 +196,7 @@ class MainFrame:
         self.menubar = Menu(self.root)
 
         self.mathmenu = Menu(self.menubar)
-        self.mathmenu.add_command(label='Add derivative for active function',
-                                  state='disabled').bind('<Button-1>', self.on_click_add_derivative)
+        self.mathmenu.add_command(label='Add derivative for active function', command=self.on_click_add_derivative)
         self.menubar.add_cascade(label='Math', menu=self.mathmenu)
 
         self.helpmenu = Menu(self.menubar)
@@ -200,7 +204,6 @@ class MainFrame:
         self.menubar.add_cascade(label='Help', menu=self.helpmenu)
 
         self.root.config(menu=self.menubar)
-
 
         self.limitations_frame = Frame(self.handler_frame, pady=50)
         self.limitations_frame.grid(row=3, column=0, columnspan=2)
@@ -315,29 +318,14 @@ class MainFrame:
             int(self.y_max_entry.get())
         )
 
-    def on_click_add_derivative(self, event):
-        self.displayer.add_derivative(self.functions_listbox.get('active'))
+    def on_click_add_derivative(self):
+        self.displayer.add_derivative(self.functions_listbox.index('active'))
         self.functions_listbox.insert('end', '('+self.functions_listbox.get('active')+")'")
 
     def on_click_add_function(self, event):
         if self.function_entry.get() == '':
             return
 
-        if ',' in self.function_entry.get():
-            showwarning(title='Wrong format', message='Please, use "." instead of ","')
-            return
-
-        try:
-            default_parser.parse(self.function_entry.get()).calculate
-
-        except AttributeError:
-            showerror(title='Parsing error', message='Wrong input format')
-            return
-
-        except OverflowError:
-            showerror(title='Overflow error', message='Too long numbers')
-        if self.functions_listbox.index('end') == 0:
-            self.mathmenu.entryconfig('Add derivative for active function', state='normal')
         self.displayer.add_function(self.function_entry.get())
         self.functions_listbox.insert('end', self.function_entry.get())
         self.function_entry.delete(0, 'end')
