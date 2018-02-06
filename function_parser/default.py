@@ -22,6 +22,11 @@ default_parser = Parser(
         FunctionOperator("tan", Tangent, 1),
         FunctionOperator("cot", Cotangent, 1),
 
+        FunctionOperator("arcsin", Arcsine, 1),
+        FunctionOperator("arccos", Arccosine, 1),
+        FunctionOperator("arctan", Arctangent, 1),
+        FunctionOperator("arccot", Arccotangent, 1),
+
         FunctionOperator("log", Logarithm, 2),
 
         FunctionOperator("sqrt", Sqrt, 1),

@@ -66,7 +66,8 @@ class Displayer(Canvas):
                     prev_x = curr_x
                     pp.append(point)
 
-                self.create_line(pp, fill=color)
+                if len(pp) > 0:
+                    self.create_line(pp, fill=color)
 
         self.y_axis = self.create_line(y_axis_position, self.canvas_size + self.border // 2,
                                        y_axis_position, self.border // 2,
