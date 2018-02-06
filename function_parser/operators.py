@@ -27,16 +27,15 @@ class FunctionOperator:
         if len(string) < len(self.name) + 2 or not string.endswith(")"):
             return None
 
-        for i in range(len(string)):
-            if string[i:].startswith(self.name) \
-                    and len(self.name) + i < len(string) \
-                    and string[len(self.name) + i] == "(":
-                string = string[i + len(self.name) + 1:-1]
-                args = [parsing_function(a) for a in string.split(',')]
+        if string.startswith(self.name) \
+                and len(self.name) < len(string) \
+                and string[len(self.name)] == "(":
+            string = string[len(self.name) + 1:-1]
+            args = [parsing_function(a) for a in string.split(',')]
 
-                if len(args) != self.args_number or any(a is None for a in args):
-                    return None
-                return Function.concat(args, self.operation)
+            if len(args) != self.args_number or any(a is None for a in args):
+                return None
+            return Function.concat(args, self.operation)
 
 
 class Brace:
