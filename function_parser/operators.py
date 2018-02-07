@@ -14,9 +14,9 @@ class Prefix(Operator):
 
     def parse(self, string, braces_pairs):
         if not string.startswith(self.name):
-            return None
+            return []
 
-        return ParsingData(self.operation, string[len(self.name):], [])
+        return [ParsingData(self.operation, [string[len(self.name):]], [])]
 
 
 class FunctionOperator(Operator):
@@ -26,17 +26,17 @@ class FunctionOperator(Operator):
         self.args_number = args_number
 
     def parse(self, string, braces_pairs):
-        if len(string) < len(self.name) + 2 or not string.endswith(")"):
-            return
-
-        if string.startswith(self.name) \
+        if len(string) > len(self.name) + 2 \
+                and string.endswith(")") \
+                and string.startswith(self.name) \
                 and len(self.name) < len(string) \
                 and string[len(self.name)] == "(":
 
             args = string[len(self.name) + 1:-1].split(',')
 
             if len(args) == self.args_number:
-                return ParsingData(self.operation, args, [])
+                return [ParsingData(self.operation, args, [])]
+        return []
 
 
 class Brace(Operator):
@@ -47,14 +47,16 @@ class Brace(Operator):
 
     def parse(self, string, braces_pairs):
         if string.startswith(self.opening_character) and string.endswith(self.closing_character):
-            return ParsingData(self.operation, [string[len(self.opening_character):-len(self.closing_character)]], [])
+            return [ParsingData(self.operation, [string[len(self.opening_character):-len(self.closing_character)]], [])]
+        return []
 
 
 class VariableOperator(Operator):
     def parse(self, string, braces_pairs):
         if string == "x":
             v = Value(0)
-            return ParsingData(v, [], [v])
+            return [ParsingData(v, [], [v])]
+        return []
 
 
 class ConstantOperator(Operator):
@@ -62,9 +64,9 @@ class ConstantOperator(Operator):
         try:
             value = float(string)
         except ValueError:
-            pass
+            return []
         else:
-            return ParsingData(Value(value), [], [])
+            return [ParsingData(Value(value), [], [])]
 
 
 class InfixOperator(Operator):
@@ -76,10 +78,9 @@ class InfixOperator(Operator):
         opening_braces = [pair[0] for pair in braces_pairs]
         closing_braces = [pair[1] for pair in braces_pairs]
         braces_counters = [0] * len(braces_pairs)
+        result = []
 
         for i in range(len(string) - 1, -1, -1):
-            s = string[i]
-
             for b in opening_braces:
                 if string[i:].startswith(b):
                     braces_counters[opening_braces.index(b)] += 1
@@ -91,6 +92,5 @@ class InfixOperator(Operator):
             if all(b == 0 for b in braces_counters) \
                     and string[i:].startswith(self.name) \
                     and (len(self.name) > 0 or i != 0):
-                return ParsingData(self.operation, [string[:i], string[i + len(self.name):]], [])
-        else:
-            return None
+                result += [ParsingData(self.operation, [string[:i], string[i + len(self.name):]], [])]
+        return result

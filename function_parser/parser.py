@@ -24,13 +24,13 @@ class Parser:
         for o in self.operators:
             result = o.parse(string, self.braces_pairs)
 
-            if result is not None:
-                args = [self._parse(a) for a in result.arguments]
+            for data in result:
+                args = [self._parse(a) for a in data.arguments]
 
                 if any(a is None for a in args):
                     continue
 
                 return args[0] \
-                    if result.operation is None \
-                    else Function.concat(args, result.operation, result.new_variables)
+                    if data.operation is None \
+                    else Function.concat(args, data.operation, data.new_variables)
         return None

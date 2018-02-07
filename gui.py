@@ -72,6 +72,10 @@ class Displayer(Canvas):
                             self.create_line(pp, fill=color, width=2)
                         pp = []
                         continue
+
+                    if abs(point[1]) > self.size_y:
+                        point = (point[0], self.size_y * point[1] / abs(point[1]))
+
                     pp.append(point)
 
                 if len(pp) > 1:
@@ -225,7 +229,7 @@ class MainFrame:
         self.y_max_entry.insert(0, '25')
         self.y_max_entry.bind('<Return>', self.rescale)
 
-        self.function_entry = Entry(self.handler_frame, width=21, foreground='grey')
+        self.function_entry = Entry(self.handler_frame, width=21, foreground='grey', font=('Consolas', 10))
         self.function_entry.bind('<Return>', self.on_click_add_function)
         self.function_entry.insert(0, 'type your function here')
         self.function_entry.bind('<FocusOut>', self.change_entry_exit)
@@ -307,27 +311,22 @@ class MainFrame:
             self.size_y_prev += delta_y
 
     def rescale(self, event):
-
         try:
-            float(self.x_min_entry.get())
-            float(self.x_max_entry.get())
-            float(self.y_min_entry.get())
-            float(self.y_max_entry.get())
+            coords = [
+                float(self.x_min_entry.get()),
+                float(self.x_max_entry.get()),
+                float(self.y_min_entry.get()),
+                float(self.y_max_entry.get()),
+            ]
         except ValueError:
             showerror(title='Wrong input', message='Only float input is allowed')
             return
 
-        if (int(self.x_max_entry.get()) - int(self.x_min_entry.get()) <= 0) or (
-                        int(self.y_max_entry.get()) - int(self.y_min_entry.get()) <= 0):
+        self.displayer.rescale(*coords)
+
+        if coords[1] - coords[0] <= 0 or coords[3] - coords[2] <= 0:
             showerror(title='Wrong input', message="It's impossible to draw graph in these limitations")
             return
-
-        self.displayer.rescale(
-            int(self.x_min_entry.get()),
-            int(self.x_max_entry.get()),
-            int(self.y_min_entry.get()),
-            int(self.y_max_entry.get())
-        )
         self._try_update_graph()
 
     def on_click_add_derivative(self):
