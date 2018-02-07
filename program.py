@@ -1,4 +1,4 @@
-from gui import MainFrame
+from expressions.displayer.gui import MainFrame
 
 
 MainFrame = MainFrame()

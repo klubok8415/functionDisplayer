@@ -1,4 +1,4 @@
-from expressions.core import Function, Value
+from expressions.core import Value
 from function_parser.parser import ParsingData
 
 
