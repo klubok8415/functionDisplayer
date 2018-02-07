@@ -73,8 +73,8 @@ class Displayer(Canvas):
                         pp = []
                         continue
 
-                    if abs(point[1]) > self.size_y:
-                        point = (point[0], self.size_y * point[1] / abs(point[1]))
+                    if point[1] > self.size_y + self.border * 3:
+                        point = (point[0], self.size_y + self.border * 3)
 
                     pp.append(point)
 
@@ -180,6 +180,27 @@ class Displayer(Canvas):
         self.update_graph()
 
 
+class EntryWithBackgroundText(Entry):
+    def __init__(self, *args, **kwargs):
+        self.background_text = kwargs.pop("background_text", "")
+        super(EntryWithBackgroundText, self).__init__(*args, **kwargs)
+        self.insert(0, self.background_text)
+        self.bind('<FocusOut>', self.change_exit)
+        self.bind('<FocusIn>', self.change_enter)
+
+    def change_exit(self, event):
+        if self.get():
+            return
+        self.delete(0, 'end')
+        self.insert(0, self.background_text)
+        self.config(foreground='grey')
+
+    def change_enter(self, event):
+        if self.get() == self.background_text:
+            self.delete(0, 'end')
+        self.config(foreground='black')
+
+
 class MainFrame:
     def __init__(self):
         self.root = Tk()
@@ -216,6 +237,15 @@ class MainFrame:
         self.listbox_frame.grid(row=1, column=0, columnspan=2)
 
         # Entries and labels below
+        self.function_entry = EntryWithBackgroundText(
+            self.handler_frame,
+            width=21,
+            foreground='grey',
+            font=('Consolas', 10),
+            background_text='Your function')
+
+        self.function_entry.bind('<Return>', self.on_click_add_function)
+
         self.x_min_entry = Entry(self.limitations_frame, width=10)
         self.x_min_entry.insert(0, '-25')
         self.x_min_entry.bind('<Return>', self.rescale)
@@ -229,18 +259,10 @@ class MainFrame:
         self.y_max_entry.insert(0, '25')
         self.y_max_entry.bind('<Return>', self.rescale)
 
-        self.function_entry = Entry(self.handler_frame, width=21, foreground='grey', font=('Consolas', 10))
-        self.function_entry.bind('<Return>', self.on_click_add_function)
-        self.function_entry.insert(0, 'type your function here')
-        self.function_entry.bind('<FocusOut>', self.change_entry_exit)
-        self.function_entry.bind('<FocusIn>', self.change_entry_enter)
-
         self.x_min_label = Label(self.limitations_frame, text='x min')
         self.x_max_label = Label(self.limitations_frame, text='x max')
         self.y_max_label = Label(self.limitations_frame, text='y max')
         self.y_min_label = Label(self.limitations_frame, text='y min')
-
-        self.function_entry.grid(row=0, column=0, columnspan=2)
 
         self.x_min_label.grid(row=0, column=0)
         self.x_max_label.grid(row=0, column=1)
@@ -250,6 +272,8 @@ class MainFrame:
         self.y_max_label.grid(row=2, column=1)
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
+
+        self.function_entry.grid(row=0, column=0, columnspan=2)
 
         # Listbox
         self.listbox_scrollbar = Scrollbar(self.listbox_frame, orient=VERTICAL)
@@ -356,6 +380,9 @@ class MainFrame:
             self.mathmenu.entryconfig('Add derivative for active function', state='disabled')
 
     def on_click_change(self, event):
+        if self.functions_listbox.size() < 1:
+            return
+
         if self.functions_listbox.get('active')[-1] == "'":
             showwarning(title='Warning', message='Impossible to change derivative')
             return
@@ -372,19 +399,8 @@ class MainFrame:
         self.displayer.clear()
         self.mathmenu.entryconfig('Add derivative for active function', state='disabled')
 
-    # methods below create background text in function entrybox
-
-    def change_entry_exit(self, event):
-        if self.function_entry.get():
-            return
-        self.function_entry.delete(0, 'end')
-        self.function_entry.insert(0, 'type your function here')
-        self.function_entry.config(foreground='grey')
-
-    def change_entry_enter(self, event):
-        if self.function_entry.get() == 'type your function here':
-            self.function_entry.delete(0, 'end')
-        self.function_entry.config(foreground='black')
+    def start(self):
+        self.root.mainloop()
 
     def help_message(self):
         showinfo(
@@ -411,9 +427,6 @@ class MainFrame:
                     '\n "||" - Modulus'
                     '\n "[]" - Floor'
                     '\n "{}" - Truncate')
-
-    def start(self):
-        self.root.mainloop()
 
 
 if __name__ == '__main__':
