@@ -9,6 +9,15 @@ import math
 from function_parser.default import default_parser
 
 
+class WrongFunctionStringError(Exception):
+    pass
+
+
+class TooBigNumbersError(Exception):
+    def __init__(self, function_index):
+        self.function_index = function_index
+
+
 class Displayer(Canvas):
     def __init__(self, root, x_min=-25, x_max=25, y_min=-25, y_max=25, size_x=500, size_y=500, border=50):
         self.root = root
@@ -25,6 +34,7 @@ class Displayer(Canvas):
                                         bg='white')
 
     def update_graph(self, color='blue'):
+        self.delete(ALL)
         x_axis_position = self.size_y // 2 + (self.y_max + self.y_min) / 2 * self.size_y / (
             self.y_max - self.y_min) + self.border // 2
         y_axis_position = self.size_x // 2 - (self.x_max + self.x_min) / 2 * self.size_x / (
@@ -42,14 +52,19 @@ class Displayer(Canvas):
         if self.functions_list:
             for f in self.functions_list:
                 pp = []
-                prev_x, prev_y, curr_x, curr_y = [numpy.NaN] * 4
 
                 for x in range(self.size_x + 1):
+                    try:
+                        current_f_value = f.calculate((self.x_max - self.x_min) / self.size_x * x + self.x_min)
+                    except OverflowError:
+                        index = self.functions_list.index(f)
+                        self.functions_list.remove(f)
+                        raise TooBigNumbersError(index)
+
                     point = (
                         x + self.border // 2,
                         self.size_y
-                        - (self.size_y * (f.calculate((self.x_max - self.x_min) / self.size_x * x + self.x_min) - self.y_min)
-                           / (self.y_max - self.y_min))
+                        - (self.size_y * (current_f_value - self.y_min) / (self.y_max - self.y_min))
                         + self.border // 2)
 
                     if math.isnan(point[1]):
@@ -57,23 +72,18 @@ class Displayer(Canvas):
                             self.create_line(pp, fill=color, width=2)
                         pp = []
                         continue
-
-                    curr_y = round(point[1])
-                    curr_x = round(point[0])
-
-                    prev_y = curr_y
-                    prev_x = curr_x
                     pp.append(point)
 
                 if len(pp) > 1:
                     self.create_line(pp, fill=color, width=2)
 
-        self.y_axis = self.create_line(y_axis_position, self.size_y + self.border // 2,
-                                       y_axis_position, self.border // 2,
-                                       width=1, arrow=LAST, fill="gray")
-        self.x_axis = self.create_line(self.border // 2, x_axis_position,
-                                       self.size_x + self.border // 2, x_axis_position,
-                                       width=1, arrow=LAST, fill="gray")
+        self.create_line(y_axis_position, self.size_y + self.border // 2,
+                         y_axis_position, self.border // 2,
+                         width=1, arrow=LAST, fill="gray")
+
+        self.create_line(self.border // 2, x_axis_position,
+                         self.size_x + self.border // 2, x_axis_position,
+                         width=1, arrow=LAST, fill="gray")
         # marking x_axis
         i = 0
         while True:
@@ -144,29 +154,16 @@ class Displayer(Canvas):
         self.y_min = y_min
         self.y_max = y_max
 
-        self.delete(ALL)
-        self.update_graph()
-
     def add_function(self, func):
-        try:
-            f = self.parser.parse(func)
+        f = self.parser.parse(func)
 
-        except AttributeError:
-            showerror(title='Parsing error', message='Wrong input format')
-            return
-
-        except OverflowError:
-            showerror(title='Overflow error', message='Too long numbers')
-            return
+        if f is None:
+            raise WrongFunctionStringError()
 
         self.functions_list.append(f)
-        self.delete(ALL)
-        self.update_graph()
 
     def add_derivative(self, index):
         self.functions_list.append(self.functions_list[index].differentiate())
-        self.delete(ALL)
-        self.update_graph()
 
     def delete_function(self, index):
         self.functions_list.pop(index)
@@ -282,6 +279,20 @@ class MainFrame:
         self.root.bind('<F2>', self.on_click_change)
         self.functions_listbox.bind('<Return>', self.on_click_add_derivative)
 
+    def _try_update_graph(self):
+        try:
+            self.displayer.update_graph()
+        except TooBigNumbersError as e:
+            showinfo(
+                title='Overflow',
+                message=str.format(
+                    'Function {0} can not be calculated. It has been safely removed from list.',
+                    self.functions_listbox.get(e.function_index)
+                )
+            )
+            self.functions_listbox.delete(e.function_index)
+            self._try_update_graph()
+
     def root_resize(self, event):
         delta_x = self.root.winfo_width() - self.size_x_prev
         delta_y = self.root.winfo_height() - self.size_y_prev
@@ -298,12 +309,12 @@ class MainFrame:
     def rescale(self, event):
 
         try:
-            int(self.x_min_entry.get())
-            int(self.x_max_entry.get())
-            int(self.y_min_entry.get())
-            int(self.y_max_entry.get())
+            float(self.x_min_entry.get())
+            float(self.x_max_entry.get())
+            float(self.y_min_entry.get())
+            float(self.y_max_entry.get())
         except ValueError:
-            showerror(title='Wrong input', message='Only numeric input is allowed')
+            showerror(title='Wrong input', message='Only float input is allowed')
             return
 
         if (int(self.x_max_entry.get()) - int(self.x_min_entry.get()) <= 0) or (
@@ -317,19 +328,27 @@ class MainFrame:
             int(self.y_min_entry.get()),
             int(self.y_max_entry.get())
         )
+        self._try_update_graph()
 
     def on_click_add_derivative(self):
         self.displayer.add_derivative(self.functions_listbox.index('active'))
         self.functions_listbox.insert('end', '('+self.functions_listbox.get('active')+")'")
+        self._try_update_graph()
 
     def on_click_add_function(self, event):
         if self.function_entry.get() == '':
             return
 
-        self.displayer.add_function(self.function_entry.get())
+        try:
+            self.displayer.add_function(self.function_entry.get())
+        except WrongFunctionStringError:
+            showerror(title='Parsing error', message='Wrong input format')
+            return
+
         self.functions_listbox.insert('end', self.function_entry.get())
         self.function_entry.delete(0, 'end')
         self.mathmenu.entryconfig('Add derivative for active function', state='normal')
+        self._try_update_graph()
 
     def on_click_delete(self, event):
         self.displayer.delete_function(self.functions_listbox.index('active'))
