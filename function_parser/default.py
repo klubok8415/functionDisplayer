@@ -12,6 +12,7 @@ default_parser = Parser(
         Prefix("-", AdditiveInversion),
 
         InfixOperator("*", Multiplication),
+        InfixOperator("", Multiplication, forbidden_right_arguments=[ConstantOperator()]),
         InfixOperator("/", Division),
 
         InfixOperator("^", Power),

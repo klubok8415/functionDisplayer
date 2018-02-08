@@ -1,5 +1,5 @@
 from expressions.core import Value
-from function_parser.parser import ParsingData
+from function_parser.parser import ParsingData, Argument
 
 
 class Operator:
@@ -16,7 +16,10 @@ class Prefix(Operator):
         if not string.startswith(self.name):
             return []
 
-        return [ParsingData(self.operation, [string[len(self.name):]], [])]
+        return [ParsingData(
+            self.operation,
+            [Argument(string[len(self.name):])]
+        )]
 
 
 class FunctionOperator(Operator):
@@ -32,7 +35,7 @@ class FunctionOperator(Operator):
                 and len(self.name) < len(string) \
                 and string[len(self.name)] == "(":
 
-            args = string[len(self.name) + 1:-1].split(',')
+            args = [Argument(a) for a in string[len(self.name) + 1:-1].split(',')]
 
             if len(args) == self.args_number:
                 return [ParsingData(self.operation, args, [])]
@@ -47,7 +50,10 @@ class Brace(Operator):
 
     def parse(self, string, braces_pairs):
         if string.startswith(self.opening_character) and string.endswith(self.closing_character):
-            return [ParsingData(self.operation, [string[len(self.opening_character):-len(self.closing_character)]], [])]
+            return [ParsingData(
+                self.operation,
+                [Argument(string[len(self.opening_character):-len(self.closing_character)])]
+            )]
         return []
 
 
@@ -66,13 +72,15 @@ class ConstantOperator(Operator):
         except ValueError:
             return []
         else:
-            return [ParsingData(Value(value), [], [])]
+            return [ParsingData(Value(value), [])]
 
 
 class InfixOperator(Operator):
-    def __init__(self, name, operation):
+    def __init__(self, name, operation, forbidden_left_arguments=None, forbidden_right_arguments=None):
         self.name = name
         self.operation = operation
+        self.forbidden_left_arguments = [] if forbidden_left_arguments is None else forbidden_left_arguments
+        self.forbidden_right_arguments = [] if forbidden_right_arguments is None else forbidden_right_arguments
 
     def parse(self, string, braces_pairs):
         opening_braces = [pair[0] for pair in braces_pairs]
@@ -92,5 +100,12 @@ class InfixOperator(Operator):
             if all(b == 0 for b in braces_counters) \
                     and string[i:].startswith(self.name) \
                     and (len(self.name) > 0 or i != 0):
-                result += [ParsingData(self.operation, [string[:i], string[i + len(self.name):]], [])]
+
+                result += [ParsingData(
+                    self.operation,
+                    [
+                        Argument(string[:i], self.forbidden_left_arguments),
+                        Argument(string[i + len(self.name):], self.forbidden_right_arguments)
+                    ]
+                )]
         return result
