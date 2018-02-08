@@ -71,7 +71,9 @@ class Division(Multiplication):
 class NaturalLogarithm(Operation):
     def calculate(self):
         x = self.args[0].calculate()
-        return math.log(x) if x > 0 else numpy.nan
+        if x == 0:
+            return numpy.nan
+        return math.log(x) if x > 0 else complex(math.log(-x), math.pi)
 
     def differentiate(self, variables):
         return Division(self.args[0].differentiate(variables), self.args[0])

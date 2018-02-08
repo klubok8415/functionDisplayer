@@ -56,6 +56,9 @@ class Displayer(Canvas):
                 for x in range(self.size_x + 1):
                     try:
                         current_f_value = f.calculate((self.x_max - self.x_min) / self.size_x * x + self.x_min)
+
+                        if isinstance(current_f_value, complex) and current_f_value.imag == 0:
+                            current_f_value = current_f_value.real
                     except OverflowError:
                         index = self.functions_list.index(f)
                         self.functions_list.remove(f)
@@ -67,7 +70,7 @@ class Displayer(Canvas):
                         - (self.size_y * (current_f_value - self.y_min) / (self.y_max - self.y_min))
                         + self.border // 2)
 
-                    if math.isnan(point[1]):
+                    if isinstance(point[1], complex) or math.isnan(point[1]):
                         if len(pp) > 0:
                             self.create_line(
                                              pp,

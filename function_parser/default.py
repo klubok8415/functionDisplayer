@@ -12,6 +12,7 @@ default_parser = Parser(
         Prefix("-", AdditiveInversion),
 
         InfixOperator("*", Multiplication),
+        InfixOperator("", Multiplication, forbidden_right_arguments=[ConstantOperator()]),
         InfixOperator("/", Division),
 
         InfixOperator("^", Power),
@@ -27,6 +28,7 @@ default_parser = Parser(
         FunctionOperator("arccot", Arccotangent, 1),
 
         FunctionOperator("log", Logarithm, 2),
+        FunctionOperator("ln", NaturalLogarithm, 1),
 
         FunctionOperator("sqrt", Sqrt, 1),
 
