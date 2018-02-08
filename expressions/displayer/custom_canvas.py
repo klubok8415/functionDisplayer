@@ -69,7 +69,11 @@ class Displayer(Canvas):
 
                     if math.isnan(point[1]):
                         if len(pp) > 0:
-                            self.create_line(pp, fill=self.default_colors[i % len(self.default_colors)], width=2)
+                            self.create_line(
+                                             pp,
+                                             fill=self.default_colors[i % len(self.default_colors)],
+                                             width=2,
+                                             tags=str(i))
                         pp = []
                         continue
 
@@ -82,7 +86,7 @@ class Displayer(Canvas):
                     pp.append(point)
 
                 if len(pp) > 1:
-                    self.create_line(pp, fill=self.default_colors[i % len(self.default_colors)], width=2)
+                    self.create_line(pp, fill=self.default_colors[i % len(self.default_colors)], width=2, tags=str(i))
 
         self.create_line(y_axis_position, self.size_y + self.border // 2,
                          y_axis_position, self.border // 2,

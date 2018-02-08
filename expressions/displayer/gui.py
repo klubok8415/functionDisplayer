@@ -10,11 +10,13 @@ from expressions.displayer.exceptions import TooBigNumbersError, WrongFunctionSt
 class MainFrame:
     def __init__(self):
         self.root = Tk()
-        self.canvas_frame = Frame(self.root)
-        self.handler_frame = Frame(self.root, padx=20)
+        self.TopFrame = Frame(self.root)
+        self.canvas_frame = Frame(self.TopFrame)
+        self.handler_frame = Frame(self.TopFrame, padx=20)
 
         self.displayer = Displayer(self.canvas_frame)
 
+        self.TopFrame.pack(side=TOP, fill=Y)
         self.canvas_frame.pack(side=LEFT, fill=X, expand=1)
         self.handler_frame.pack(side=LEFT, fill=X)
 
@@ -101,12 +103,19 @@ class MainFrame:
         self.clear_but.bind('<Button-1>', self.on_click_clear)
         self.clear_but.grid(row=0, column=2)
 
+        # status bar
+        self.statusbar = Label(self.root, bd=1, relief=SUNKEN, anchor=W)
+        self.statusbar.pack(side=BOTTOM, fill=X)
+
         self.root.update()
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
         self.size_x_prev = self.root.winfo_width()
         self.size_y_prev = self.root.winfo_height()
         self.root.bind('<Configure>', self.root_resize)
+        self.root.bind('<Button-1>', self.get_function_name)
+
+
 
         # Hot keys
         self.root.bind('<Delete>', self.on_click_delete)
@@ -203,6 +212,21 @@ class MainFrame:
         self.functions_listbox.delete(0, 'end')
         self.displayer.clear()
         self.mathmenu.entryconfig('Add derivative for active function', state='disabled')
+
+    def get_function_name(self, event):
+        try:
+            self.statusbar.config(
+                text='Function is {}'.format(self.functions_listbox.get(
+                    int(self.displayer.gettags(
+                        self.displayer.find_overlapping(
+                            event.x - 10,
+                            event.y - 10,
+                            event.x + 10,
+                            event.y + 10
+                        )[0])[0]))))
+        except IndexError:
+            self.statusbar.config(text='')
+
 
     def start(self):
         self.root.mainloop()
