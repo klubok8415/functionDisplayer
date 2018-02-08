@@ -64,6 +64,9 @@ class Displayer(Canvas):
                     if point[1] > self.size_y + self.border + 10:
                         point = (point[0], self.size_y + self.border + 10)
 
+                    if point[1] < self.border / 2 or point[1] > self.size_y + self.border / 2:
+                        continue
+
                     pp.append(point)
 
                 if len(pp) > 1:

@@ -45,7 +45,7 @@ class MainFrame:
         # Entries and labels below
         self.function_entry = EntryWithBackgroundText(
             self.handler_frame,
-            width=21,
+            width=27,
             foreground='grey',
             font=('Consolas', 10),
             background_text='Your function')
