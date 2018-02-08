@@ -1,3 +1,5 @@
+import math
+
 from expressions.core import Value
 from function_parser.parser import ParsingData, Argument
 
@@ -67,12 +69,16 @@ class VariableOperator(Operator):
 
 class ConstantOperator(Operator):
     def parse(self, string, braces_pairs):
-        try:
-            value = float(string)
-        except ValueError:
-            return []
+        if string == "e":
+            value = math.e
+        elif string == "pi":
+            value = math.pi
         else:
-            return [ParsingData(Value(value), [])]
+            try:
+                value = float(string)
+            except ValueError:
+                return []
+        return [ParsingData(Value(value), [])]
 
 
 class InfixOperator(Operator):
