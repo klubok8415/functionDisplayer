@@ -20,8 +20,20 @@ class Displayer(Canvas):
         self.parser = default_parser
         super(Displayer, self).__init__(self.root, width=self.size_x + self.border, height=self.size_y + self.border,
                                         bg='white')
+        self.default_colors = [
+            '#0A62A5',
+            '#181CB3',
+            '#6D0AF7',
+            '#F600F6',
+            '#FC004C',
+            '#FF4900',
+            '#FF9000',
+            '#FFBF00',
+            '#FFE800',
+            '#9BED00',
+            '#00C80D']
 
-    def update_graph(self, color='blue'):
+    def update_graph(self):
         self.delete(ALL)
         x_axis_position = self.size_y // 2 + (self.y_max + self.y_min) / 2 * self.size_y / (
             self.y_max - self.y_min) + self.border // 2
@@ -38,7 +50,7 @@ class Displayer(Canvas):
             y_axis_position = self.size_y + self.border / 2
 
         if self.functions_list:
-            for f in self.functions_list:
+            for i, f in enumerate(self.functions_list):
                 pp = []
 
                 for x in range(self.size_x + 1):
@@ -60,7 +72,7 @@ class Displayer(Canvas):
 
                     if isinstance(point[1], complex) or math.isnan(point[1]):
                         if len(pp) > 0:
-                            self.create_line(pp, fill=color, width=2)
+                            self.create_line(pp, fill=self.default_colors[i % len(self.default_colors)], width=2)
                         pp = []
                         continue
 
@@ -73,7 +85,7 @@ class Displayer(Canvas):
                     pp.append(point)
 
                 if len(pp) > 1:
-                    self.create_line(pp, fill=color, width=2)
+                    self.create_line(pp, fill=self.default_colors[i % len(self.default_colors)], width=2)
 
         self.create_line(y_axis_position, self.size_y + self.border // 2,
                          y_axis_position, self.border // 2,

@@ -88,7 +88,6 @@ class MainFrame:
         self.listbox_scrollbar.pack(side=RIGHT, fill=Y)
         self.functions_listbox.pack(side=LEFT, fill=BOTH)
 
-
         # handling buttons
         self.delete_but = Button(self.listbox_handler_frame, text='delete')
         self.delete_but.bind('<Button-1>', self.on_click_delete)
@@ -103,6 +102,7 @@ class MainFrame:
         self.clear_but.grid(row=0, column=2)
 
         self.root.update()
+        self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())
         self.size_x_prev = self.root.winfo_width()
         self.size_y_prev = self.root.winfo_height()
