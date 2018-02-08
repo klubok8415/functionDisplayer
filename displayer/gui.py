@@ -1,10 +1,10 @@
 from tkinter import *
-
 from tkinter.messagebox import *
 
-from expressions.displayer.custom_canvas import Displayer
-from expressions.displayer.custom_entry import EntryWithBackgroundText
-from expressions.displayer.exceptions import TooBigNumbersError, WrongFunctionStringError
+from displayer.custom_canvas import Displayer
+from displayer.custom_entry import EntryWithBackgroundText
+
+from displayer.exceptions import TooBigNumbersError, WrongFunctionStringError
 
 
 class MainFrame:

@@ -1,8 +1,7 @@
+import math
 from tkinter import *
 
-import math
-
-from expressions.displayer.exceptions import TooBigNumbersError, WrongFunctionStringError
+from displayer.exceptions import TooBigNumbersError, WrongFunctionStringError
 from function_parser.default import default_parser
 
 
