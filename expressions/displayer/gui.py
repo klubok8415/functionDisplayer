@@ -113,7 +113,7 @@ class MainFrame:
         self.size_x_prev = self.root.winfo_width()
         self.size_y_prev = self.root.winfo_height()
         self.root.bind('<Configure>', self.root_resize)
-        self.root.bind('<Button-1>', self.get_function_name)
+        self.root.bind('<Motion>', self.get_function_name)
 
 
 
@@ -216,17 +216,16 @@ class MainFrame:
     def get_function_name(self, event):
         try:
             self.statusbar.config(
-                text='Function is {}'.format(self.functions_listbox.get(
+                text=self.functions_listbox.get(
                     int(self.displayer.gettags(
                         self.displayer.find_overlapping(
                             event.x - 10,
                             event.y - 10,
                             event.x + 10,
                             event.y + 10
-                        )[0])[0]))))
-        except IndexError:
+                        )[0])[0])))
+        except (IndexError, ValueError):
             self.statusbar.config(text='')
-
 
     def start(self):
         self.root.mainloop()
