@@ -27,6 +27,7 @@ default_parser = Parser(
         FunctionOperator("arccot", Arccotangent, 1),
 
         FunctionOperator("log", Logarithm, 2),
+        FunctionOperator("ln", NaturalLogarithm, 1),
 
         FunctionOperator("sqrt", Sqrt, 1),
 
