@@ -4,6 +4,7 @@ from expressions.math.trigonometry import *
 from function_parser.operators import *
 from function_parser.parser import Parser
 
+__constant_operator = ConstantOperator()
 default_parser = Parser(
     [
         InfixOperator("+", Addition),
@@ -12,7 +13,7 @@ default_parser = Parser(
         Prefix("-", AdditiveInversion),
 
         InfixOperator("*", Multiplication),
-        InfixOperator("", Multiplication, forbidden_right_arguments=[ConstantOperator()]),
+        InfixOperator("", Multiplication, forbidden_right_arguments=[__constant_operator]),
         InfixOperator("/", Division),
 
         InfixOperator("^", Power),
@@ -33,7 +34,7 @@ default_parser = Parser(
         FunctionOperator("sqrt", Sqrt, 1),
 
         VariableOperator(),
-        ConstantOperator(),
+        __constant_operator,
     ],
     [
         Brace("(", ")"),

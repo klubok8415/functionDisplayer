@@ -1,4 +1,5 @@
 import math
+from statistics import median
 from tkinter import *
 
 from displayer.exceptions import TooBigNumbersError, WrongFunctionStringError
@@ -49,8 +50,19 @@ class Displayer(Canvas):
             y_axis_position = self.size_y + self.border / 2
 
         if self.functions_list:
+
+            def draw_line():
+                if len(pp) > 1:
+                    self.create_line(
+                        pp,
+                        fill=self.default_colors[i % len(self.default_colors)],
+                        width=2,
+                        tags=str(i))
+
             for i, f in enumerate(self.functions_list):
                 pp = []
+                prev_y = 0
+                is_prev_y_outside_borders = True
 
                 for x in range(self.size_x + 1):
                     try:
@@ -58,6 +70,7 @@ class Displayer(Canvas):
 
                         if isinstance(current_f_value, complex) and current_f_value.imag == 0:
                             current_f_value = current_f_value.real
+
                     except OverflowError:
                         index = self.functions_list.index(f)
                         self.functions_list.remove(f)
@@ -69,27 +82,32 @@ class Displayer(Canvas):
                         - (self.size_y * (current_f_value - self.y_min) / (self.y_max - self.y_min))
                         + self.border // 2)
 
-                    if isinstance(point[1], complex) or math.isnan(point[1]):
-                        if len(pp) > 0:
-                            self.create_line(
-                                             pp,
-                                             fill=self.default_colors[i % len(self.default_colors)],
-                                             width=2,
-                                             tags=str(i))
+                    is_y_float = not (isinstance(point[1], complex) or math.isnan(point[1]))
+
+                    is_y_outside_borders = \
+                        is_y_float and (point[1] < self.border / 2 or point[1] > self.size_y + self.border / 2)
+
+                    if is_y_outside_borders:
+                        border_y = median((point[1], self.border / 2, self.size_y + self.border / 2))
+                        pp.append((border_y / (point[1] - prev_y) + point[0], border_y))
+                    elif is_y_float and is_prev_y_outside_borders:
+                        border_y = median((prev_y, self.border / 2, self.size_y + self.border / 2))
+                        pp = [(border_y / (prev_y - point[1]) + point[0] - 1, border_y)]
+
+                    if not is_y_float or is_y_outside_borders:
+                        draw_line()
                         pp = []
-                        continue
-
-                    if point[1] > self.size_y + self.border + 10:
-                        point = (point[0], self.size_y + self.border + 10)
-
-                    if point[1] < self.border / 2 or point[1] > self.size_y + self.border / 2:
                         continue
 
                     pp.append(point)
 
-                if len(pp) > 1:
-                    self.create_line(pp, fill=self.default_colors[i % len(self.default_colors)], width=2, tags=str(i))
+                    prev_y = point[1]
+                    is_prev_y_outside_borders = is_y_outside_borders
 
+                if len(pp) > 1:
+                    draw_line()
+
+        # drawing axis lines
         self.create_line(y_axis_position, self.size_y + self.border // 2,
                          y_axis_position, self.border // 2,
                          width=1, arrow=LAST, fill="gray")
