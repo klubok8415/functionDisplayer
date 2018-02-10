@@ -4,7 +4,8 @@ from tkinter.messagebox import *
 from displayer.custom_canvas import Displayer
 from displayer.custom_entry import EntryWithBackgroundText
 
-from displayer.exceptions import TooBigNumbersError, WrongFunctionStringError
+from displayer.exceptions import TooBigNumbersError
+from function_parser.default import default_parser
 
 
 class MainFrame:
@@ -15,6 +16,8 @@ class MainFrame:
         self.handler_frame = Frame(self.TopFrame, padx=20)
 
         self.displayer = Displayer(self.canvas_frame)
+        self.functions = []
+        self.parser = default_parser
 
         self.TopFrame.pack(side=TOP, fill=Y)
         self.canvas_frame.pack(side=LEFT, fill=X, expand=1)
@@ -169,19 +172,33 @@ class MainFrame:
         self._try_update_graph()
 
     def on_click_add_derivative(self):
-        self.displayer.add_derivative(self.functions_listbox.index('active'))
-        self.functions_listbox.insert('end', '('+self.functions_listbox.get('active')+")'")
+        f = self.functions[self.functions_listbox.index('active')].differentiate()
+
+        if f is None:
+            showinfo(title='Differentiating problem', message='Function can not be differentiated')
+            return
+
+        self.displayer.add_function(f.calculate)
+        self.functions.append(f)
+
+        parent_function_text = self.functions_listbox.get('active')
+        self.functions_listbox.insert(
+            'end',
+            str.format(
+                "{0}'" if parent_function_text[-1] == "'" else "({0})'",
+                parent_function_text))
         self._try_update_graph()
 
     def on_click_add_function(self, event):
         if self.function_entry.get() == '':
             return
 
-        try:
-            self.displayer.add_function(self.function_entry.get())
-        except WrongFunctionStringError:
+        f = self.parser.parse(self.function_entry.get())
+        if f is None:
             showerror(title='Parsing error', message='Wrong input format')
             return
+        self.displayer.add_function(f.calculate)
+        self.functions.append(f)
 
         self.functions_listbox.insert('end', self.function_entry.get())
         self.function_entry.delete(0, 'end')
@@ -190,9 +207,11 @@ class MainFrame:
 
     def on_click_delete(self, event):
         self.displayer.delete_function(self.functions_listbox.index('active'))
+        self.functions.pop(self.functions_listbox.index('active'))
         self.functions_listbox.delete('active')
         if self.functions_listbox.index('end') == 0:
             self.mathmenu.entryconfig('Add derivative for active function', state='disabled')
+        self._try_update_graph()
 
     def on_click_change(self, event):
         if self.functions_listbox.size() < 1:

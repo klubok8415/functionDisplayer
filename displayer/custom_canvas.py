@@ -2,8 +2,7 @@ import math
 from statistics import median
 from tkinter import *
 
-from displayer.exceptions import TooBigNumbersError, WrongFunctionStringError
-from function_parser.default import default_parser
+from displayer.exceptions import TooBigNumbersError
 
 
 class Displayer(Canvas):
@@ -17,7 +16,6 @@ class Displayer(Canvas):
         self.y_min = y_min
         self.y_max = y_max
         self.functions_list = []
-        self.parser = default_parser
         super(Displayer, self).__init__(self.root, width=self.size_x + self.border, height=self.size_y + self.border,
                                         bg='white')
         self.default_colors = [
@@ -62,11 +60,11 @@ class Displayer(Canvas):
             for i, f in enumerate(self.functions_list):
                 pp = []
                 prev_y = 0
-                is_prev_y_outside_borders = True
+                is_prev_y_outside_borders = False
 
                 for x in range(self.size_x + 1):
                     try:
-                        current_f_value = f.calculate((self.x_max - self.x_min) / self.size_x * x + self.x_min)
+                        current_f_value = f((self.x_max - self.x_min) / self.size_x * x + self.x_min)
 
                         if isinstance(current_f_value, complex) and current_f_value.imag == 0:
                             current_f_value = current_f_value.real
@@ -89,10 +87,13 @@ class Displayer(Canvas):
 
                     if is_y_outside_borders:
                         border_y = median((point[1], self.border / 2, self.size_y + self.border / 2))
-                        pp.append((border_y / (point[1] - prev_y) + point[0], border_y))
+                        pp.append((point[0], border_y))
                     elif is_y_float and is_prev_y_outside_borders:
                         border_y = median((prev_y, self.border / 2, self.size_y + self.border / 2))
-                        pp = [(border_y / (prev_y - point[1]) + point[0] - 1, border_y)]
+                        pp = [(point[0], border_y)] + pp
+
+                    prev_y = point[1]
+                    is_prev_y_outside_borders = is_y_outside_borders
 
                     if not is_y_float or is_y_outside_borders:
                         draw_line()
@@ -100,9 +101,6 @@ class Displayer(Canvas):
                         continue
 
                     pp.append(point)
-
-                    prev_y = point[1]
-                    is_prev_y_outside_borders = is_y_outside_borders
 
                 if len(pp) > 1:
                     draw_line()
@@ -185,21 +183,12 @@ class Displayer(Canvas):
         self.y_min = y_min
         self.y_max = y_max
 
-    def add_function(self, func):
-        f = self.parser.parse(func)
-
-        if f is None:
-            raise WrongFunctionStringError()
-
+    def add_function(self, f):
         self.functions_list.append(f)
-
-    def add_derivative(self, index):
-        self.functions_list.append(self.functions_list[index].differentiate())
 
     def delete_function(self, index):
         self.functions_list.pop(index)
         self.delete(ALL)
-        self.update_graph()
 
     def clear(self):
         self.functions_list = []
