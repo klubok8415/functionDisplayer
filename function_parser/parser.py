@@ -3,12 +3,6 @@ import re
 from expressions.core import Function
 
 
-class Argument:
-    def __init__(self, string, forbidden_operators=None):
-        self.string = string
-        self.forbidden_operations = [] if forbidden_operators is None else forbidden_operators
-
-
 class ParsingData:
     def __init__(self, operation, arguments, new_variables=None):
         self.operation = operation
@@ -36,7 +30,7 @@ class Parser:
             result = o.parse(string, self.braces_pairs, self.element_pattern)
 
             for data in result:
-                args = [self._parse(a.string, a.forbidden_operations) for a in data.arguments]
+                args = [self._parse(a) for a in data.arguments]
 
                 if any(a is None for a in args):
                     continue

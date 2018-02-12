@@ -2,7 +2,7 @@ import math
 
 from expressions.core import Value
 from function_parser.lexis_helper import startswith, endswith, split
-from function_parser.parser import ParsingData, Argument
+from function_parser.parser import ParsingData
 
 
 class Operator:
@@ -22,7 +22,7 @@ class Prefix(Operator):
 
         return [ParsingData(
             self.operation,
-            [Argument(lexis_string[len(converted_name):])]
+            [lexis_string[len(converted_name):]]
         )]
 
 
@@ -36,7 +36,7 @@ class FunctionOperator(Operator):
         converted_name = element_pattern.findall(self.name)
 
         if startswith(lexis_string, converted_name + ["("]) and endswith(lexis_string, [")"]):
-            args = [Argument(a) for a in split(lexis_string[len(converted_name) + 1:-1], ',')]
+            args = [a for a in split(lexis_string[len(converted_name) + 1:-1], ',')]
 
             if len(args) == self.args_number:
                 return [ParsingData(self.operation, args, [])]
@@ -56,7 +56,7 @@ class Brace(Operator):
         if startswith(lexis_string, converted_opening_name) and endswith(lexis_string, converted_closing_name):
             return [ParsingData(
                 self.operation,
-                [Argument(lexis_string[len(converted_opening_name):-len(converted_closing_name)])]
+                [lexis_string[len(converted_opening_name):-len(converted_closing_name)]]
             )]
         return []
 
@@ -87,11 +87,9 @@ class ConstantOperator(Operator):
 
 
 class InfixOperator(Operator):
-    def __init__(self, name, operation, forbidden_left_arguments=None, forbidden_right_arguments=None):
+    def __init__(self, name, operation):
         self.name = name
         self.operation = operation
-        self.forbidden_left_arguments = [] if forbidden_left_arguments is None else forbidden_left_arguments
-        self.forbidden_right_arguments = [] if forbidden_right_arguments is None else forbidden_right_arguments
 
     def parse(self, lexis_string, braces_pairs, element_pattern):
         opening_braces = [element_pattern.findall(pair[0]) for pair in braces_pairs]
@@ -116,8 +114,8 @@ class InfixOperator(Operator):
                 result += [ParsingData(
                     self.operation,
                     [
-                        Argument(lexis_string[:i], self.forbidden_left_arguments),
-                        Argument(lexis_string[i + len(converted_name):], self.forbidden_right_arguments)
+                        lexis_string[:i],
+                        lexis_string[i + len(converted_name):],
                     ]
                 )]
         return result
