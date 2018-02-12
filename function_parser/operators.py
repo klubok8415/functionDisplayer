@@ -1,11 +1,12 @@
 import math
 
 from expressions.core import Value
+from function_parser.lexis_helper import startswith, endswith, split
 from function_parser.parser import ParsingData, Argument
 
 
 class Operator:
-    def parse(self, string, braces_pairs):
+    def parse(self, lexis_string, braces_pairs, element_pattern):
         raise NotImplementedError()
 
 
@@ -14,13 +15,14 @@ class Prefix(Operator):
         self.name = name
         self.operation = operation
 
-    def parse(self, string, braces_pairs):
-        if not string.startswith(self.name):
+    def parse(self, lexis_string, braces_pairs, element_pattern):
+        converted_name = element_pattern.findall(self.name)
+        if not startswith(lexis_string, converted_name):
             return []
 
         return [ParsingData(
             self.operation,
-            [Argument(string[len(self.name):])]
+            [Argument(lexis_string[len(converted_name):])]
         )]
 
 
@@ -30,14 +32,11 @@ class FunctionOperator(Operator):
         self.operation = operation
         self.args_number = args_number
 
-    def parse(self, string, braces_pairs):
-        if len(string) > len(self.name) + 2 \
-                and string.endswith(")") \
-                and string.startswith(self.name) \
-                and len(self.name) < len(string) \
-                and string[len(self.name)] == "(":
+    def parse(self, lexis_string, braces_pairs, element_pattern):
+        converted_name = element_pattern.findall(self.name)
 
-            args = [Argument(a) for a in string[len(self.name) + 1:-1].split(',')]
+        if startswith(lexis_string, converted_name + ["("]) and endswith(lexis_string, [")"]):
+            args = [Argument(a) for a in split(lexis_string[len(converted_name) + 1:-1], ',')]
 
             if len(args) == self.args_number:
                 return [ParsingData(self.operation, args, [])]
@@ -45,37 +44,43 @@ class FunctionOperator(Operator):
 
 
 class Brace(Operator):
-    def __init__(self, opening_character, closing_character, operation=None):
-        self.opening_character = opening_character
-        self.closing_character = closing_character
+    def __init__(self, opening_name, closing_name, operation=None):
+        self.opening_name = opening_name
+        self.closing_name = closing_name
         self.operation = operation
 
-    def parse(self, string, braces_pairs):
-        if string.startswith(self.opening_character) and string.endswith(self.closing_character):
+    def parse(self, lexis_string, braces_pairs, element_pattern):
+        converted_opening_name = element_pattern.findall(self.opening_name)
+        converted_closing_name = element_pattern.findall(self.closing_name)
+
+        if startswith(lexis_string, converted_opening_name) and endswith(lexis_string, converted_closing_name):
             return [ParsingData(
                 self.operation,
-                [Argument(string[len(self.opening_character):-len(self.closing_character)])]
+                [Argument(lexis_string[len(converted_opening_name):-len(converted_closing_name)])]
             )]
         return []
 
 
 class VariableOperator(Operator):
-    def parse(self, string, braces_pairs):
-        if string == "x":
+    def parse(self, lexis_string, braces_pairs, element_pattern):
+        if lexis_string == element_pattern.findall("x"):
             v = Value(0)
             return [ParsingData(v, [], [v])]
         return []
 
 
 class ConstantOperator(Operator):
-    def parse(self, string, braces_pairs):
-        if string == "e":
+    def parse(self, lexis_string, braces_pairs, element_pattern):
+        if lexis_string == element_pattern.findall("e"):
             value = math.e
-        elif string == "pi":
+        elif lexis_string == element_pattern.findall("pi"):
             value = math.pi
         else:
+            if len(lexis_string) != 1:
+                return []
+
             try:
-                value = float(string)
+                value = float(lexis_string[0])
             except ValueError:
                 return []
         return [ParsingData(Value(value), [])]
@@ -88,30 +93,31 @@ class InfixOperator(Operator):
         self.forbidden_left_arguments = [] if forbidden_left_arguments is None else forbidden_left_arguments
         self.forbidden_right_arguments = [] if forbidden_right_arguments is None else forbidden_right_arguments
 
-    def parse(self, string, braces_pairs):
-        opening_braces = [pair[0] for pair in braces_pairs]
-        closing_braces = [pair[1] for pair in braces_pairs]
+    def parse(self, lexis_string, braces_pairs, element_pattern):
+        opening_braces = [element_pattern.findall(pair[0]) for pair in braces_pairs]
+        closing_braces = [element_pattern.findall(pair[1]) for pair in braces_pairs]
         braces_counters = [0] * len(braces_pairs)
         result = []
+        converted_name = element_pattern.findall(self.name)
 
-        for i in range(len(string) - 1, -1, -1):
+        for i in range(len(lexis_string) - 1, -1, -1):
             for b in opening_braces:
-                if string[i:].startswith(b):
+                if startswith(lexis_string[i:], b):
                     braces_counters[opening_braces.index(b)] += 1
 
             for b in closing_braces:
-                if string[i:].startswith(b):
+                if startswith(lexis_string[i:], b):
                     braces_counters[closing_braces.index(b)] -= 1
 
             if all(b == 0 for b in braces_counters) \
-                    and string[i:].startswith(self.name) \
-                    and (len(self.name) > 0 or i != 0):
+                    and startswith(lexis_string[i:], converted_name) \
+                    and (len(converted_name) > 0 or i != 0):
 
                 result += [ParsingData(
                     self.operation,
                     [
-                        Argument(string[:i], self.forbidden_left_arguments),
-                        Argument(string[i + len(self.name):], self.forbidden_right_arguments)
+                        Argument(lexis_string[:i], self.forbidden_left_arguments),
+                        Argument(lexis_string[i + len(converted_name):], self.forbidden_right_arguments)
                     ]
                 )]
         return result

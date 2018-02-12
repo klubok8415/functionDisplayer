@@ -1,3 +1,5 @@
+import re
+
 from expressions.core import Function
 
 
@@ -15,12 +17,13 @@ class ParsingData:
 
 
 class Parser:
-    def __init__(self, operators, braces):
+    def __init__(self, operators, braces, element_pattern=None):
         self.operators = braces + operators
-        self.braces_pairs = [(b.opening_character, b.closing_character) for b in braces]
+        self.braces_pairs = [(b.opening_name, b.closing_name) for b in braces]
+        self.element_pattern = re.compile(r'([\d.-]+|\S)') if element_pattern is None else element_pattern
 
     def parse(self, string):
-        return self._parse(string.replace(" ", ""))
+        return self._parse(self.element_pattern.findall(string))
 
     def _parse(self, string, forbidden_operators=None):
         if forbidden_operators is None:
@@ -30,7 +33,7 @@ class Parser:
             return None
 
         for o in (o for o in self.operators if o not in forbidden_operators):
-            result = o.parse(string, self.braces_pairs)
+            result = o.parse(string, self.braces_pairs, self.element_pattern)
 
             for data in result:
                 args = [self._parse(a.string, a.forbidden_operations) for a in data.arguments]
