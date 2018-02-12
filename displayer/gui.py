@@ -5,6 +5,7 @@ from displayer.custom_canvas import Displayer
 from displayer.custom_entry import EntryWithBackgroundText
 
 from displayer.exceptions import TooBigNumbersError
+from expressions.core import DifferentiationError
 from function_parser.default import default_parser
 
 
@@ -172,9 +173,10 @@ class MainFrame:
         self._try_update_graph()
 
     def on_click_add_derivative(self):
-        f = self.functions[self.functions_listbox.index('active')].differentiate()
+        try:
+            f = self.functions[self.functions_listbox.index('active')].differentiate()
 
-        if f is None:
+        except DifferentiationError:
             showinfo(title='Differentiating problem', message='Function can not be differentiated')
             return
 

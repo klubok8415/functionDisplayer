@@ -45,3 +45,7 @@ class Value:
 
     def __call__(self, *args):
         return self
+
+
+class DifferentiationError(Exception):
+    pass
