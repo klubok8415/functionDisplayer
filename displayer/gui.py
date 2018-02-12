@@ -219,7 +219,7 @@ class MainFrame:
         if self.functions_listbox.size() < 1:
             return
 
-        if self.functions_listbox.get('active')[-1] == "'":
+        if self.functions_listbox.get('active').endswith("'"):
             showwarning(title='Warning', message='Impossible to change derivative')
             return
         # deleting background text in function entry
@@ -227,11 +227,14 @@ class MainFrame:
 
         self.function_entry.insert(0, self.functions_listbox.get('active'))
         self.displayer.delete_function(self.functions_listbox.index('active'))
+        self.functions.pop(self.functions_listbox.index('active'))
         self.functions_listbox.delete('active')
+        self._try_update_graph()
 
     def on_click_clear(self, event):
         self.functions_listbox.delete(0, 'end')
         self.displayer.clear()
+        self.functions.clear()
         self.mathmenu.entryconfig('Add derivative for active function', state='disabled')
 
     def get_function_name(self, event):
