@@ -54,9 +54,22 @@ class Brace(Operator):
         converted_closing_name = element_pattern.findall(self.closing_name)
 
         if startswith(lexis_string, converted_opening_name) and endswith(lexis_string, converted_closing_name):
+            lexis_string = lexis_string[len(converted_opening_name):-len(converted_closing_name)]
+
+            braces_counter = 0
+            if converted_opening_name != converted_closing_name:
+                for i in range(len(lexis_string)):
+                    if startswith(lexis_string[i:], converted_opening_name):
+                        braces_counter += 1
+                    elif startswith(lexis_string[i:], converted_closing_name):
+                        braces_counter -= 1
+
+                        if braces_counter < 0:
+                            return []
+
             return [ParsingData(
                 self.operation,
-                [lexis_string[len(converted_opening_name):-len(converted_closing_name)]]
+                [lexis_string]
             )]
         return []
 
