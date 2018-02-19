@@ -7,6 +7,9 @@ from displayer.exceptions import TooBigNumbersError
 
 class Displayer(Canvas):
     def __init__(self, root, x_min=-25, x_max=25, y_min=-25, y_max=25, size_x=500, size_y=500, border=50):
+        self.motion = False
+        self.x_moving_speed = 0.2
+        self.y_moving_speed = 0.2
         self.root = root
         self.size_x = size_x
         self.size_y = size_y
@@ -18,6 +21,11 @@ class Displayer(Canvas):
         self.functions_list = []
         super(Displayer, self).__init__(self.root, width=self.size_x + self.border, height=self.size_y + self.border,
                                         bg='white')
+        self.previous_mouse_x = 0
+        self.previous_mouse_y = 0
+        self.bind('<Motion>', self.on_motion)
+        self.bind('<Button-1>', self.on_click)
+        self.bind('<ButtonRelease-1>', self.on_release)
         self.default_colors = [
             '#0A62A5',
             '#181CB3',
@@ -27,8 +35,6 @@ class Displayer(Canvas):
             '#FF4900',
             '#FF9000',
             '#FFBF00',
-            '#FFE800',
-            '#9BED00',
             '#00C80D']
 
     def update_graph(self):
@@ -194,3 +200,23 @@ class Displayer(Canvas):
         self.functions_list = []
         self.delete(ALL)
         self.update_graph()
+
+    def on_click(self, event):
+        self.motion = True
+
+    def on_release(self, event):
+        self.motion = False
+
+    def on_motion(self, event):
+        if self.motion:
+            dx = (event.x - self.previous_mouse_x) * self.x_moving_speed
+            dy = (event.y - self.previous_mouse_y) * self.y_moving_speed
+
+            self.x_max -= dx
+            self.x_min -= dx
+
+            self.y_max += dy
+            self.y_min += dy
+            self.update_graph()
+        self.previous_mouse_x = event.x
+        self.previous_mouse_y = event.y
