@@ -8,8 +8,6 @@ from displayer.exceptions import TooBigNumbersError
 class Displayer(Canvas):
     def __init__(self, root, x_min=-25, x_max=25, y_min=-25, y_max=25, size_x=500, size_y=500, border=50):
         self.motion = False
-        self.x_moving_speed = 0.2
-        self.y_moving_speed = 0.2
         self.root = root
         self.size_x = size_x
         self.size_y = size_y
@@ -209,8 +207,8 @@ class Displayer(Canvas):
 
     def on_motion(self, event):
         if self.motion:
-            dx = (event.x - self.previous_mouse_x) * self.x_moving_speed
-            dy = (event.y - self.previous_mouse_y) * self.y_moving_speed
+            dx = (event.x - self.previous_mouse_x) / self.size_x * (self.x_max - self.x_min)
+            dy = (event.y - self.previous_mouse_y) / self.size_y * (self.y_max - self.x_min)
 
             self.x_max -= dx
             self.x_min -= dx
