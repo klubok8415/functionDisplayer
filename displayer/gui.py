@@ -38,11 +38,36 @@ class MainFrame:
         self.helpmenu.add_command(label='Help', command=MainFrame.help_message)
         self.menubar.add_cascade(label='Help', menu=self.helpmenu)
 
+
         self.root.config(menu=self.menubar)
-        self.range_frame = Frame(self.handler_frame, pady=20)
-        self.range_frame.grid(row=3, column=0, columnspan=2)
-        self.limitations_frame = Frame(self.handler_frame, pady=30)
+
+        self.radio_frame = Frame(self.handler_frame, pady=20)
+        self.radio_frame.grid(row=3, column=0, columnspan=2)
+        self.radio_var = IntVar(self.radio_frame)
+        self.radio_var.set(1)
+
+        self.radiobutton_limitations = Radiobutton(
+                                            self.radio_frame,
+                                            text='Particular limitations',
+                                            command=self.show_limitations,
+                                            variable=self.radio_var,
+                                            value=1
+                                            )
+        self.radiobutton_limitations.pack(anchor='w')
+
+        self.radiobutton_ranges = Radiobutton(
+                                            self.radio_frame,
+                                            text='Ranges for axis',
+                                            command=self.show_ranges,
+                                            variable=self.radio_var,
+                                            value=2
+                                            )
+        self.radiobutton_ranges.pack(anchor='w')
+
+        self.range_frame = Frame(self.handler_frame, pady=25)
+        self.limitations_frame = Frame(self.handler_frame)
         self.limitations_frame.grid(row=4, column=0, columnspan=2)
+
 
         self.listbox_handler_frame = Frame(self.handler_frame)
         self.listbox_handler_frame.grid(row=2, column=0, columnspan=2)
@@ -316,6 +341,17 @@ class MainFrame:
         self.x_max_entry.insert(0, str(round(self.x_range / 2, 1)))
         self.y_max_entry.insert(0, str(round(self.y_range / 2, 1)))
         self.rescale(0)
+
+    def show_limitations(self):
+        self.range_frame.grid_forget()
+        self.limitations_frame.grid(row=4, column=0, columnspan=2)
+        print('Hello world')
+
+    def show_ranges(self):
+        self.limitations_frame.grid_forget()
+        self.range_frame.grid(row=5, column=0, columnspan=2)
+        print('Hello world')
+
 
     def start(self):
         self._try_update_graph()
