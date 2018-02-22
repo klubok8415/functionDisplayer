@@ -6,7 +6,7 @@ from displayer.exceptions import TooBigNumbersError
 
 
 class Displayer(Canvas):
-    def __init__(self, root, x_min=-25, x_max=25, y_min=-25, y_max=25, size_x=500, size_y=500, border=50):
+    def __init__(self, root, x_min=-25.0, x_max=25.0, y_min=-25.0, y_max=25.0, size_x=500, size_y=500, border=50):
         self.motion = False
         self.root = root
         self.size_x = size_x
@@ -201,6 +201,8 @@ class Displayer(Canvas):
 
     def on_click(self, event):
         self.motion = True
+        self.previous_mouse_y = event.y
+        self.previous_mouse_x = event.x
 
     def on_release(self, event):
         self.motion = False

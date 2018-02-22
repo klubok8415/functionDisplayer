@@ -34,40 +34,20 @@ class MainFrame:
         self.mathmenu.add_command(label='Add derivative for active function', command=self.on_click_add_derivative)
         self.menubar.add_cascade(label='Math', menu=self.mathmenu)
 
+        self.displayer_menu = Menu(self.menubar)
+        self.displayer_menu.add_command(label='Use particular limitations', command=self.show_limitations)
+        self.displayer_menu.add_command(label='Use ranges for axes', command=self.show_ranges)
+        self.menubar.add_cascade(label='Displaying options', menu=self.displayer_menu)
+
         self.helpmenu = Menu(self.menubar)
         self.helpmenu.add_command(label='Help', command=MainFrame.help_message)
         self.menubar.add_cascade(label='Help', menu=self.helpmenu)
 
-
         self.root.config(menu=self.menubar)
-
-        self.radio_frame = Frame(self.handler_frame, pady=20)
-        self.radio_frame.grid(row=3, column=0, columnspan=2)
-        self.radio_var = IntVar(self.radio_frame)
-        self.radio_var.set(1)
-
-        self.radiobutton_limitations = Radiobutton(
-                                            self.radio_frame,
-                                            text='Particular limitations',
-                                            command=self.show_limitations,
-                                            variable=self.radio_var,
-                                            value=1
-                                            )
-        self.radiobutton_limitations.pack(anchor='w')
-
-        self.radiobutton_ranges = Radiobutton(
-                                            self.radio_frame,
-                                            text='Ranges for axis',
-                                            command=self.show_ranges,
-                                            variable=self.radio_var,
-                                            value=2
-                                            )
-        self.radiobutton_ranges.pack(anchor='w')
 
         self.range_frame = Frame(self.handler_frame, pady=25)
         self.limitations_frame = Frame(self.handler_frame)
         self.limitations_frame.grid(row=4, column=0, columnspan=2)
-
 
         self.listbox_handler_frame = Frame(self.handler_frame)
         self.listbox_handler_frame.grid(row=2, column=0, columnspan=2)
@@ -76,11 +56,16 @@ class MainFrame:
         self.listbox_frame.grid(row=1, column=0, columnspan=2)
 
         # Entries and labels below
+        self.function_label = Label(
+            self.handler_frame,
+            text='y =',
+            font=('Consolas', 14))
+
         self.function_entry = EntryWithBackgroundText(
             self.handler_frame,
-            width=27,
+            width=18,
             foreground='grey',
-            font=('Consolas', 10),
+            font=('Consolas', 14),
             background_text='Your function')
 
         self.function_entry.bind('<Return>', self.on_click_add_function)
@@ -129,7 +114,8 @@ class MainFrame:
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
 
-        self.function_entry.grid(row=0, column=0, columnspan=2)
+        self.function_label.grid(row=0, column=0)
+        self.function_entry.grid(row=0, column=1)
 
         # Listbox
         self.listbox_scrollbar = Scrollbar(self.listbox_frame, orient=VERTICAL)
@@ -277,7 +263,7 @@ class MainFrame:
             showwarning(title='Warning', message='Impossible to change derivative')
             return
         # deleting background text in function entry
-        self.function_entry.delete(0, 'end')
+        self.function_entry.change_enter(1)
 
         self.function_entry.insert(0, self.functions_listbox.get('active'))
         self.displayer.delete_function(self.functions_listbox.index('active'))
@@ -312,7 +298,7 @@ class MainFrame:
 
         try:
             self.statusbar.config(
-                text=self.functions_listbox.get(
+                text='y='+self.functions_listbox.get(
                     int(self.displayer.gettags(
                         self.displayer.find_overlapping(
                             event.x - 10,
@@ -345,12 +331,10 @@ class MainFrame:
     def show_limitations(self):
         self.range_frame.grid_forget()
         self.limitations_frame.grid(row=4, column=0, columnspan=2)
-        print('Hello world')
 
     def show_ranges(self):
         self.limitations_frame.grid_forget()
         self.range_frame.grid(row=5, column=0, columnspan=2)
-        print('Hello world')
 
 
     def start(self):
