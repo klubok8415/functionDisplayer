@@ -1,7 +1,7 @@
 import math
 from statistics import median
 from tkinter import *
-
+import platform
 from displayer.exceptions import TooBigNumbersError
 
 
@@ -209,14 +209,24 @@ class Displayer(Canvas):
         self.motion = False
 
     def scroll(self, event):
-        if self.x_max - self.x_min + event.delta < 0.1 \
-                or self.y_max - self.y_min + event.delta < 0.1:
+        if platform.system() == 'Windows':
+            delta = -event.delta / 120
+        else:
+            delta = event.delta
+        if (self.x_max - self.x_min + delta) < 1 or (self.y_max - self.y_min + delta) < 1:
             return
-        self.x_max += event.delta / 2 / (event.x / (self.size_x - event.x))
-        self.y_max += event.delta / 2 * (event.y / (self.size_y - event.y))
-        self.x_min -= event.delta / 2 * (event.x / (self.size_x - event.x))
-        self.y_min -= event.delta / 2 / (event.y / (self.size_y - event.y))
-        self.update_graph()
+        self.x_max += delta / 2 / (event.x / (self.size_x - event.x))
+        self.y_max += delta / 2 * (event.y / (self.size_y - event.y))
+        self.x_min -= delta / 2 * (event.x / (self.size_x - event.x))
+        self.y_min -= delta / 2 / (event.y / (self.size_y - event.y))
+        try:
+            self.update_graph()
+        except OverflowError:
+            self.x_max -= delta / 2 / (event.x / (self.size_x - event.x))
+            self.y_max -= delta / 2 * (event.y / (self.size_y - event.y))
+            self.x_min += delta / 2 * (event.x / (self.size_x - event.x))
+            self.y_min += delta / 2 / (event.y / (self.size_y - event.y))
+            self.update_graph()
 
     def on_motion(self, event):
         if self.motion:

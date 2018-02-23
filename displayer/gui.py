@@ -33,6 +33,10 @@ class MainFrame:
         self.mathmenu.add_command(label='Add derivative for active function', command=self.on_click_add_derivative)
         self.menubar.add_cascade(label='Math', menu=self.mathmenu)
 
+        self.displayer_menu = Menu(self.menubar)
+        self.displayer_menu.add_command(label='Center origin', command=self.recenter_canvas)
+        self.menubar.add_cascade(label='Displaying options', menu=self.displayer_menu)
+
         self.helpmenu = Menu(self.menubar)
         self.helpmenu.add_command(label='Help', command=self.help_message)
         self.menubar.add_cascade(label='Help', menu=self.helpmenu)
@@ -282,6 +286,18 @@ class MainFrame:
             self.y_min_entry.insert(0, str(round(self.displayer.y_min, 1)))
             self.x_max_entry.insert(0, str(round(self.displayer.x_max, 1)))
             self.y_max_entry.insert(0, str(round(self.displayer.y_max, 1)))
+
+    def recenter_canvas(self):
+        x_max = (self.displayer.x_max - self.displayer.x_min) / 2
+        x_min = - (self.displayer.x_max - self.displayer.x_min) / 2
+        y_max = (self.displayer.y_max - self.displayer.y_min) / 2
+        y_min = - (self.displayer.y_max - self.displayer.y_min) / 2
+        self.displayer.x_max = x_max
+        self.displayer.x_min = x_min
+        self.displayer.y_max = y_max
+        self.displayer.y_min = y_min
+        self.check_limitations(1)
+        self._try_update_graph()
 
     def start(self):
         self._try_update_graph()
