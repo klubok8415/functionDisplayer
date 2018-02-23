@@ -9,7 +9,6 @@ from expressions.core import DifferentiationError
 from function_parser.default import default_parser
 
 import signal
-from displayer.exceptions import TimeOutError
 
 
 class MainFrame:
@@ -210,10 +209,11 @@ class MainFrame:
             return
 
         signal.signal(signal.SIGALRM, self.timeout)
-        signal.alarm(10)
+        signal.alarm(5)
         try:
             f = self.parser.parse(self.function_entry.get())
-        except TimeOutError:
+        except TimeoutError:
+            signal.alarm(0)
             showerror(title='Input error', message='Function cannot be displayed')
             return
 
@@ -315,7 +315,8 @@ class MainFrame:
 
     @staticmethod
     def timeout(*args):
-        raise TimeOutError
+        raise TimeoutError
+        return
 
     @staticmethod
     def help_message():
