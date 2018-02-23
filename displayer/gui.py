@@ -138,6 +138,8 @@ class MainFrame:
         self.root.bind('<Delete>', self.on_click_delete)
         self.root.bind('<F2>', self.on_click_change)
         self.functions_listbox.bind('<Return>', self.on_click_add_derivative)
+        self.root.bind('<Control-d>', self.on_click_add_derivative)
+
 
     def _try_update_graph(self):
         try:
@@ -185,7 +187,7 @@ class MainFrame:
             return
         self._try_update_graph()
 
-    def on_click_add_derivative(self):
+    def on_click_add_derivative(self, event):
         try:
             f = self.functions[self.functions_listbox.index('active')].differentiate()
 
@@ -216,6 +218,7 @@ class MainFrame:
             signal.alarm(0)
             showerror(title='Input error', message='Function cannot be displayed')
             return
+        signal.alarm(0)
 
         if f is None:
             showerror(title='Parsing error', message='Wrong input format')
@@ -343,7 +346,15 @@ class MainFrame:
                     '\n "()" - Brackets'
                     '\n "||" - Modulus'
                     '\n "[]" - Floor'
-                    '\n "{}" - Truncate')
+                    '\n "{}" - Truncate'
+                    '\n'
+                    '\n Hot keys:'
+                    '\n "F2" - Change active function'
+                    '\n "Control+D" - Add derivative to active function'
+                    '\n "Del" - Delete active function'
+                    '\n "Return in any entry" - draw the graph with current limitations'
+
+        )
 
 
 if __name__ == '__main__':
