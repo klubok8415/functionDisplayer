@@ -24,6 +24,7 @@ class Displayer(Canvas):
         self.bind('<Motion>', self.on_motion)
         self.bind('<Button-1>', self.on_click)
         self.bind('<ButtonRelease-1>', self.on_release)
+        self.bind('<MouseWheel>', self.scroll)
         self.default_colors = [
             '#0A62A5',
             '#181CB3',
@@ -206,6 +207,16 @@ class Displayer(Canvas):
 
     def on_release(self, event):
         self.motion = False
+
+    def scroll(self, event):
+        if self.x_max - self.x_min + event.delta < 0.1 \
+                or self.y_max - self.y_min + event.delta < 0.1:
+                return
+        self.x_max += event.delta / 2
+        self.y_max += event.delta / 2
+        self.x_min -= event.delta / 2
+        self.y_min -= event.delta / 2
+        self.update_graph()
 
     def on_motion(self, event):
         if self.motion:
