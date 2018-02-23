@@ -59,7 +59,7 @@ class Arctangent(Operation):
             return numpy.nan
 
     def differentiate(self, variables):
-        return Multiplication(
+        return Division(
             self.args[0].differentiate(variables),
             Addition(Value(1), Power(self.args[0], Value(2)))
         )

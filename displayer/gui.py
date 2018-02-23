@@ -15,6 +15,7 @@ class MainFrame:
         self.TopFrame = Frame(self.root)
         self.canvas_frame = Frame(self.TopFrame)
         self.handler_frame = Frame(self.TopFrame, padx=20)
+        self.canvas_motion = False
 
         self.displayer = Displayer(self.canvas_frame)
         self.functions = []
@@ -33,14 +34,20 @@ class MainFrame:
         self.mathmenu.add_command(label='Add derivative for active function', command=self.on_click_add_derivative)
         self.menubar.add_cascade(label='Math', menu=self.mathmenu)
 
+        self.displayer_menu = Menu(self.menubar)
+        self.displayer_menu.add_command(label='Use particular limitations', command=self.show_limitations)
+        self.displayer_menu.add_command(label='Use ranges for axes', command=self.show_ranges)
+        self.menubar.add_cascade(label='Displaying options', menu=self.displayer_menu)
+
         self.helpmenu = Menu(self.menubar)
         self.helpmenu.add_command(label='Help', command=MainFrame.help_message)
         self.menubar.add_cascade(label='Help', menu=self.helpmenu)
 
         self.root.config(menu=self.menubar)
 
-        self.limitations_frame = Frame(self.handler_frame, pady=50)
-        self.limitations_frame.grid(row=3, column=0, columnspan=2)
+        self.range_frame = Frame(self.handler_frame, pady=25)
+        self.limitations_frame = Frame(self.handler_frame)
+        self.limitations_frame.grid(row=4, column=0, columnspan=2)
 
         self.listbox_handler_frame = Frame(self.handler_frame)
         self.listbox_handler_frame.grid(row=2, column=0, columnspan=2)
@@ -49,11 +56,16 @@ class MainFrame:
         self.listbox_frame.grid(row=1, column=0, columnspan=2)
 
         # Entries and labels below
+        self.function_label = Label(
+            self.handler_frame,
+            text='y =',
+            font=('Consolas', 14))
+
         self.function_entry = EntryWithBackgroundText(
             self.handler_frame,
-            width=27,
+            width=18,
             foreground='grey',
-            font=('Consolas', 10),
+            font=('Consolas', 14),
             background_text='Your function')
 
         self.function_entry.bind('<Return>', self.on_click_add_function)
@@ -71,10 +83,27 @@ class MainFrame:
         self.y_max_entry.insert(0, '25')
         self.y_max_entry.bind('<Return>', self.rescale)
 
+        self.x_range_entry = Entry(self.range_frame, width=10)
+        self.x_range_entry.insert(0, '50')
+        self.x_range_entry.bind('<Return>', self.change_range)
+        self.y_range_entry = Entry(self.range_frame, width=10)
+        self.y_range_entry.insert(0, '50')
+        self.y_range_entry.bind('<Return>', self.change_range)
+        self.x_range = 50
+        self.y_range = 50
+
         self.x_min_label = Label(self.limitations_frame, text='x min')
         self.x_max_label = Label(self.limitations_frame, text='x max')
         self.y_max_label = Label(self.limitations_frame, text='y max')
         self.y_min_label = Label(self.limitations_frame, text='y min')
+
+        self.x_range_label = Label(self.range_frame, text='x range')
+        self.y_range_label = Label(self.range_frame, text='y range')
+
+        self.x_range_label.grid(row=0, column=0)
+        self.y_range_label.grid(row=0, column=1)
+        self.x_range_entry.grid(row=1, column=0)
+        self.y_range_entry.grid(row=1, column=1)
 
         self.x_min_label.grid(row=0, column=0)
         self.x_max_label.grid(row=0, column=1)
@@ -85,7 +114,8 @@ class MainFrame:
         self.y_min_entry.grid(row=3, column=0)
         self.y_max_entry.grid(row=3, column=1)
 
-        self.function_entry.grid(row=0, column=0, columnspan=2)
+        self.function_label.grid(row=0, column=0)
+        self.function_entry.grid(row=0, column=1)
 
         # Listbox
         self.listbox_scrollbar = Scrollbar(self.listbox_frame, orient=VERTICAL)
@@ -117,9 +147,9 @@ class MainFrame:
         self.size_x_prev = self.root.winfo_width()
         self.size_y_prev = self.root.winfo_height()
         self.root.bind('<Configure>', self.root_resize)
-        self.root.bind('<Motion>', self.get_function_name)
-
-
+        self.root.bind('<Motion>', self.canvas_on_motion)
+        self.root.bind('<Button-1>', self.canvas_on_click)
+        self.root.bind('<ButtonRelease-1>', self.canvas_on_release)
 
         # Hot keys
         self.root.bind('<Delete>', self.on_click_delete)
@@ -165,6 +195,14 @@ class MainFrame:
             showerror(title='Wrong input', message='Only float input is allowed')
             return
 
+        self.x_range_entry.delete(0, 'end')
+        self.y_range_entry.delete(0, 'end')
+
+        self.x_range_entry.insert(0, str(coords[1] - coords[0]))
+        self.y_range_entry.insert(0, str(coords[3] - coords[2]))
+        self.x_range = coords[1] - coords[0]
+        self.y_range = coords[3] - coords[2]
+
         self.displayer.rescale(*coords)
 
         if coords[1] - coords[0] <= 0 or coords[3] - coords[2] <= 0:
@@ -208,6 +246,8 @@ class MainFrame:
         self._try_update_graph()
 
     def on_click_delete(self, event):
+        if self.functions_listbox.index('end') == 0:
+            return
         self.displayer.delete_function(self.functions_listbox.index('active'))
         self.functions.pop(self.functions_listbox.index('active'))
         self.functions_listbox.delete('active')
@@ -223,7 +263,7 @@ class MainFrame:
             showwarning(title='Warning', message='Impossible to change derivative')
             return
         # deleting background text in function entry
-        self.function_entry.delete(0, 'end')
+        self.function_entry.change_enter(1)
 
         self.function_entry.insert(0, self.functions_listbox.get('active'))
         self.displayer.delete_function(self.functions_listbox.index('active'))
@@ -237,10 +277,28 @@ class MainFrame:
         self.functions.clear()
         self.mathmenu.entryconfig('Add derivative for active function', state='disabled')
 
-    def get_function_name(self, event):
+    def canvas_on_click(self, event):
+        self.canvas_motion = True
+
+    def canvas_on_release(self, event):
+        self.canvas_motion = False
+
+    def canvas_on_motion(self, event):
+        if self.canvas_motion:
+
+            self.x_min_entry.delete(0, 'end')
+            self.y_min_entry.delete(0, 'end')
+            self.x_max_entry.delete(0, 'end')
+            self.y_max_entry.delete(0, 'end')
+
+            self.x_min_entry.insert(0, str(round(self.displayer.x_min, 1)))
+            self.y_min_entry.insert(0, str(round(self.displayer.y_min, 1)))
+            self.x_max_entry.insert(0, str(round(self.displayer.x_max, 1)))
+            self.y_max_entry.insert(0, str(round(self.displayer.y_max, 1)))
+
         try:
             self.statusbar.config(
-                text=self.functions_listbox.get(
+                text='y='+self.functions_listbox.get(
                     int(self.displayer.gettags(
                         self.displayer.find_overlapping(
                             event.x - 10,
@@ -251,7 +309,36 @@ class MainFrame:
         except (IndexError, ValueError):
             self.statusbar.config(text='')
 
+    def change_range(self, event):
+        try:
+            self.x_range = float(self.x_range_entry.get())
+            self.y_range = float(self.y_range_entry.get())
+        except ValueError:
+            showerror(title='Wrong input', message='Only float input is allowed')
+            return
+
+        self.x_min_entry.delete(0, 'end')
+        self.y_min_entry.delete(0, 'end')
+        self.x_max_entry.delete(0, 'end')
+        self.y_max_entry.delete(0, 'end')
+
+        self.x_min_entry.insert(0, str(round(-self.x_range / 2, 1)))
+        self.y_min_entry.insert(0, str(round(-self.y_range / 2, 1)))
+        self.x_max_entry.insert(0, str(round(self.x_range / 2, 1)))
+        self.y_max_entry.insert(0, str(round(self.y_range / 2, 1)))
+        self.rescale(0)
+
+    def show_limitations(self):
+        self.range_frame.grid_forget()
+        self.limitations_frame.grid(row=4, column=0, columnspan=2)
+
+    def show_ranges(self):
+        self.limitations_frame.grid_forget()
+        self.range_frame.grid(row=5, column=0, columnspan=2)
+
+
     def start(self):
+        self._try_update_graph()
         self.root.mainloop()
 
     @staticmethod

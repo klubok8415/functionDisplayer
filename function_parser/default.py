@@ -15,7 +15,8 @@ default_parser = Parser(
         InfixOperator("", Multiplication),
         InfixOperator("/", Division),
 
-        InfixOperator("^", Power),
+        InfixOperator("**", Power),
+        InfixOperator("ˆ", Power),
 
         FunctionOperator("sin", Sinus, 1),
         FunctionOperator("cos", Cosine, 1),
