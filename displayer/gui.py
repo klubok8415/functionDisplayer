@@ -8,6 +8,9 @@ from displayer.exceptions import TooBigNumbersError
 from expressions.core import DifferentiationError
 from function_parser.default import default_parser
 
+import signal
+from displayer.exceptions import TimeOutError
+
 
 class MainFrame:
     def __init__(self):
@@ -206,7 +209,14 @@ class MainFrame:
         if self.function_entry.get() == '':
             return
 
-        f = self.parser.parse(self.function_entry.get())
+        signal.signal(signal.SIGALRM, self.timeout)
+        signal.alarm(10)
+        try:
+            f = self.parser.parse(self.function_entry.get())
+        except TimeOutError:
+            showerror(title='Input error', message='Function cannot be displayed')
+            return
+
         if f is None:
             showerror(title='Parsing error', message='Wrong input format')
             return
@@ -302,6 +312,10 @@ class MainFrame:
     def start(self):
         self._try_update_graph()
         self.root.mainloop()
+
+    @staticmethod
+    def timeout(*args):
+        raise TimeOutError
 
     @staticmethod
     def help_message():
