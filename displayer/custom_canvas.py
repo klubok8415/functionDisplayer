@@ -211,11 +211,11 @@ class Displayer(Canvas):
     def scroll(self, event):
         if self.x_max - self.x_min + event.delta < 0.1 \
                 or self.y_max - self.y_min + event.delta < 0.1:
-                return
-        self.x_max += event.delta / 2
-        self.y_max += event.delta / 2
-        self.x_min -= event.delta / 2
-        self.y_min -= event.delta / 2
+            return
+        self.x_max += event.delta / 2 / (event.x / (self.size_x - event.x))
+        self.y_max += event.delta / 2 * (event.y / (self.size_y - event.y))
+        self.x_min -= event.delta / 2 * (event.x / (self.size_x - event.x))
+        self.y_min -= event.delta / 2 / (event.y / (self.size_y - event.y))
         self.update_graph()
 
     def on_motion(self, event):
