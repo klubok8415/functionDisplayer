@@ -14,7 +14,7 @@ class Parser:
     def __init__(self, operators, braces, element_pattern=None):
         self.operators = braces + operators
         self.braces_pairs = [(b.opening_name, b.closing_name) for b in braces]
-        self.element_pattern = re.compile(r'([\d.-]+|\S)') if element_pattern is None else element_pattern
+        self.element_pattern = re.compile(r'([\d.]+|\S)') if element_pattern is None else element_pattern
 
     def parse(self, string):
         return self._parse(self.element_pattern.findall(string))
