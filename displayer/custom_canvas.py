@@ -135,7 +135,10 @@ class Displayer(Canvas):
             x = self.size_x * (
                 1 - (1 - 1 / ((self.x_max - self.x_min) * (10 ** n)) * (a - self.x_min * (10 ** n))))
 
-            if x > self.size_x:
+            if x < self.border // 8:
+                continue
+
+            if x > self.size_x - self.border // 8:
                 break
 
             self.create_line(x + self.border // 2, -2 + x_axis_position, x + self.border // 2, 2 + x_axis_position,
@@ -164,7 +167,10 @@ class Displayer(Canvas):
 
             y = self.size_y * (1 - 1 / ((self.y_max - self.y_min) * (10 ** n)) * (a - self.y_min * (10 ** n)))
 
-            if y < 0:
+            if y > self.size_y - self.border // 8:
+                continue
+
+            if y < self.border // 8:
                 break
 
             self.create_line(-2 + y_axis_position, y + self.border // 2, 2 + y_axis_position, y + self.border // 2,
