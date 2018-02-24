@@ -1,4 +1,5 @@
 import re
+import stopit
 
 from expressions.core import Function
 
@@ -16,6 +17,7 @@ class Parser:
         self.braces_pairs = [(b.opening_name, b.closing_name) for b in braces]
         self.element_pattern = re.compile(r'([\d.]+|\S)') if element_pattern is None else element_pattern
 
+    @stopit.threading_timeoutable(default='Parsing error')
     def parse(self, string):
         return self._parse(self.element_pattern.findall(string))
 
