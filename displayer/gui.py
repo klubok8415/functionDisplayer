@@ -7,8 +7,7 @@ from displayer.custom_entry import EntryWithBackgroundText
 from displayer.exceptions import TooBigNumbersError
 from expressions.core import DifferentiationError
 from function_parser.default import default_parser
-
-import signal
+import threading
 
 
 class MainFrame:
@@ -209,16 +208,15 @@ class MainFrame:
         if self.function_entry.get() == '':
             return
 
-        signal.signal(signal.SIGALRM, self.timeout)
-        signal.alarm(5)
+        timer = threading.Timer(5.0, self.timeout)
+        timer.start()
         try:
             f = self.parser.parse(self.function_entry.get())
         except TimeoutError:
-            signal.alarm(0)
+            timer.cancel()
             showerror(title='Input error', message='Function cannot be displayed')
             return
-        signal.alarm(0)
-
+        timer.cancel()
         if f is None:
             showerror(title='Parsing error', message='Wrong input format')
             return
@@ -316,8 +314,8 @@ class MainFrame:
         self.root.mainloop()
 
     @staticmethod
-    def timeout(*args):
-        raise TimeoutError
+    def timeout():
+        raise TimeoutError()
         return
 
     @staticmethod
