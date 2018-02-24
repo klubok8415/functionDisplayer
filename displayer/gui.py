@@ -140,7 +140,6 @@ class MainFrame:
         self.functions_listbox.bind('<Return>', self.on_click_add_derivative)
         self.root.bind('<Control-d>', self.on_click_add_derivative)
 
-
     def _try_update_graph(self):
         try:
             self.displayer.update_graph()
@@ -355,7 +354,6 @@ class MainFrame:
                     '\n "Return in any entry" - draw the graph with current limitations'
 
         )
-
 
 if __name__ == '__main__':
     MainFrame().start()
