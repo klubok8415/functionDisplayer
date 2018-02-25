@@ -221,18 +221,14 @@ class Displayer(Canvas):
             delta = event.delta
         if (self.x_max - self.x_min + delta) < 1 or (self.y_max - self.y_min + delta) < 1:
             return
-        self.x_max += delta / 2
-        self.y_max += delta / 2
-        self.x_min -= delta / 2
-        self.y_min -= delta / 2
         try:
+            self.x_max += delta / 2
+            self.y_max += delta / 2
+            self.x_min -= delta / 2
+            self.y_min -= delta / 2
             self.update_graph()
         except OverflowError:
-            self.x_max -= delta / 2
-            self.y_max -= delta / 2
-            self.x_min += delta / 2
-            self.y_min += delta / 2
-            self.update_graph()
+            return
 
     def on_motion(self, event):
         if self.motion:
