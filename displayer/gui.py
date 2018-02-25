@@ -14,7 +14,6 @@ class MainFrame:
         self.TopFrame = Frame(self.root)
         self.canvas_frame = Frame(self.TopFrame)
         self.handler_frame = Frame(self.TopFrame, padx=20)
-        self.root.tk_setPalette(background='#ececec')
         self.displayer = Displayer(self.canvas_frame)
         self.functions = []
         self.parser = default_parser
@@ -98,21 +97,21 @@ class MainFrame:
 
         # Listbox
         self.listbox_scrollbar = Scrollbar(self.listbox_frame, orient=VERTICAL)
-        self.functions_listbox = Listbox(self.listbox_frame, yscrollcommand=self.listbox_scrollbar.set)
+        self.functions_listbox = Listbox(self.listbox_frame, yscrollcommand=self.listbox_scrollbar.set, width=23)
         self.listbox_scrollbar.config(command=self.functions_listbox.yview)
         self.listbox_scrollbar.pack(side=RIGHT, fill=Y)
         self.functions_listbox.pack(side=LEFT, fill=BOTH)
 
         # handling buttons
-        self.delete_but = Button(self.listbox_handler_frame, width=2, text='delete', padx=20)
+        self.delete_but = Button(self.listbox_handler_frame, text='delete', padx=20)
         self.delete_but.bind('<Button-1>', self.on_click_delete)
         self.delete_but.grid(row=0, column=0)
 
-        self.change_but = Button(self.listbox_handler_frame, width=2, text='change', padx=20)
+        self.change_but = Button(self.listbox_handler_frame, text='change', padx=20)
         self.change_but.bind('<Button-1>', self.on_click_change)
         self.change_but.grid(row=0, column=1)
 
-        self.clear_but = Button(self.listbox_handler_frame, width=2, text='clear', padx=20)
+        self.clear_but = Button(self.listbox_handler_frame, text='clear', padx=20)
         self.clear_but.bind('<Button-1>', self.on_click_clear)
         self.clear_but.grid(row=0, column=2)
 
