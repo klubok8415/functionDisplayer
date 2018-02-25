@@ -11,6 +11,7 @@ from function_parser.default import default_parser
 class MainFrame:
     def __init__(self):
         self.root = Tk()
+        self.root.title('Function displayer')
         self.TopFrame = Frame(self.root)
         self.canvas_frame = Frame(self.TopFrame)
         self.handler_frame = Frame(self.TopFrame, padx=20)
@@ -182,7 +183,7 @@ class MainFrame:
             return
         self._try_update_graph()
 
-    def on_click_add_derivative(self, event):
+    def on_click_add_derivative(self, *args):  # argument list for platform compatibility
         try:
             f = self.functions[self.functions_listbox.index('active')].differentiate()
 
