@@ -18,6 +18,7 @@ class MainFrame:
         self.displayer = Displayer(self.canvas_frame)
         self.functions = []
         self.parser = default_parser
+        self.cursor_in_displayer = False
 
         self.TopFrame.pack(side=TOP, fill=Y)
         self.canvas_frame.pack(side=LEFT, fill=X, expand=1)
@@ -130,6 +131,8 @@ class MainFrame:
         self.root.bind('<Button-1>', self.canvas_on_click)
         self.root.bind('<ButtonRelease-1>', self.canvas_on_release)
         self.root.bind('<MouseWheel>', self.check_limitations)
+        self.displayer.bind('<Enter>', self.cursor_enters_displayer)
+        self.displayer.bind('<Leave>', self.cursor_exits_displayer)
 
         # Hot keys
         self.root.bind('<Delete>', self.on_click_delete)
@@ -259,7 +262,8 @@ class MainFrame:
         self.canvas_motion = False
 
     def canvas_on_motion(self, event):
-        self.check_limitations(1)
+        if self.cursor_in_displayer:
+            self.check_limitations(1)
         try:
             self.statusbar.config(
                 text='y=' + self.functions_listbox.get(
@@ -272,6 +276,12 @@ class MainFrame:
                         )[0])[0])))
         except (IndexError, ValueError):
             self.statusbar.config(text='')
+
+    def cursor_enters_displayer(self, e):
+        self.cursor_in_displayer = True
+
+    def cursor_exits_displayer(self, e):
+        self.cursor_in_displayer = False
 
     def check_limitations(self, event):
         if self.displayer.x_min != float(self.x_min_entry.get()) \
