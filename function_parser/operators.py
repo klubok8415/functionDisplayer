@@ -1,6 +1,7 @@
 import math
 
 from expressions.core import Value
+from function_parser.lexis.lexis_element import LexisElement
 from function_parser.lexis_helper import startswith, endswith, split
 from function_parser.parser import ParsingData
 
@@ -9,21 +10,31 @@ class Operator:
     def parse(self, lexis_string, braces_pairs, element_pattern):
         raise NotImplementedError()
 
+    def get_determinants(self):
+        return []
+
 
 class Prefix(Operator):
+    TYPE_NAME = "prefix"
+
     def __init__(self, name, operation):
         self.name = name
         self.operation = operation
 
     def parse(self, lexis_string, braces_pairs, element_pattern):
-        converted_name = element_pattern.findall(self.name)
-        if not startswith(lexis_string, converted_name):
+        if not startswith(lexis_string, [LexisElement(self.name, Prefix.TYPE_NAME)]):
             return []
 
         return [ParsingData(
             self.operation,
-            [lexis_string[len(converted_name):]]
+            [lexis_string[1:]]
         )]
+
+    def get_determinants(self):
+        return [
+            lambda s: [LexisElement(self.name, Prefix.TYPE_NAME)] if s.startswith(self.name) else []
+        ]
+
 
 
 class FunctionOperator(Operator):
@@ -75,11 +86,18 @@ class Brace(Operator):
 
 
 class VariableOperator(Operator):
+    TYPE_NAME = "variable"
+
     def parse(self, lexis_string, braces_pairs, element_pattern):
-        if lexis_string == element_pattern.findall("x"):
+        if startswith(lexis_string, [LexisElement("x", VariableOperator.TYPE_NAME)]):
             v = Value(0)
             return [ParsingData(v, [], [v])]
         return []
+
+    def get_determinants(self):
+        return [
+            lambda s: [LexisElement("x", VariableOperator.TYPE_NAME)] if s.startswith("x") else []
+        ]
 
 
 class ConstantOperator(Operator):

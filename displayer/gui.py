@@ -8,8 +8,6 @@ from displayer.exceptions import TooBigNumbersError
 from expressions.core import DifferentiationError
 from function_parser.default import default_parser
 
-import signal
-
 
 class MainFrame:
     def __init__(self):
@@ -27,6 +25,7 @@ class MainFrame:
         self.handler_frame.pack(side=LEFT, fill=X)
 
         self.displayer.pack()
+        self.canvas_motion = False
 
         # menu bar
         self.menubar = Menu(self.root)
@@ -186,7 +185,7 @@ class MainFrame:
             return
         self._try_update_graph()
 
-    def on_click_add_derivative(self, event):
+    def on_click_add_derivative(self, *args):
         try:
             f = self.functions[self.functions_listbox.index('active')].differentiate()
 
@@ -209,15 +208,11 @@ class MainFrame:
         if self.function_entry.get() == '':
             return
 
-        signal.signal(signal.SIGALRM, self.timeout)
-        signal.alarm(5)
         try:
             f = self.parser.parse(self.function_entry.get())
         except TimeoutError:
-            signal.alarm(0)
             showerror(title='Input error', message='Function cannot be displayed')
             return
-        signal.alarm(0)
 
         if f is None:
             showerror(title='Parsing error', message='Wrong input format')
