@@ -22,7 +22,7 @@ default_parser = Parser(
         # FunctionOperator("sqrt", Sqrt, 1),
 
         VariableOperator(),
-        # ConstantOperator(),
+        ConstantOperator(),
 
         # InfixOperator("+", Addition),
         # InfixOperator("-", Deduction),

@@ -1,5 +1,7 @@
 import math
 
+import re
+
 from expressions.core import Value
 from function_parser.lexis.lexis_element import LexisElement
 from function_parser.lexis_helper import startswith, endswith, split
@@ -11,7 +13,7 @@ class Operator:
         raise NotImplementedError()
 
     def get_determinants(self):
-        return []
+        raise NotImplementedError()
 
 
 class Prefix(Operator):
@@ -101,20 +103,35 @@ class VariableOperator(Operator):
 
 
 class ConstantOperator(Operator):
+    TYPE_NAME = "constant"
+    E = "e"
+    PI = "pi"
+
     def parse(self, lexis_string, braces_pairs, element_pattern):
-        if lexis_string == element_pattern.findall("e"):
+        first_element = lexis_string[0][0]
+
+        if first_element.type != ConstantOperator.TYPE_NAME:
+            return []
+
+        if first_element.string == ConstantOperator.E:
             value = math.e
-        elif lexis_string == element_pattern.findall("pi"):
+        elif first_element.string == ConstantOperator.PI:
             value = math.pi
         else:
-            if len(lexis_string) != 1:
-                return []
-
             try:
-                value = float(lexis_string[0])
+                value = float(first_element.string)
             except ValueError:
                 return []
         return [ParsingData(Value(value), [])]
+
+    @staticmethod
+    def constant_determinant(string):
+        m = re.match(r'^([\d.]+|' + ConstantOperator.E + '|' + ConstantOperator.PI + ')', string)
+
+        return [] if m is None else [LexisElement(m.group(0), ConstantOperator.TYPE_NAME)]
+
+    def get_determinants(self):
+        return [self.constant_determinant]
 
 
 class InfixOperator(Operator):
