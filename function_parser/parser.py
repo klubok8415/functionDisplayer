@@ -12,12 +12,11 @@ class ParsingData:
 
 
 class Parser:
-    def __init__(self, operators, braces, element_pattern=None):
+    def __init__(self, operators, braces):
         self.lexis_analyzer = LexisAnalyzer(sum([o.get_determinants() for o in operators], []))
 
         self.operators = braces + operators
         self.braces_pairs = [(b.opening_name, b.closing_name) for b in braces]
-        self.element_pattern = re.compile(r'([\d.]+|\S)') if element_pattern is None else element_pattern
 
     def parse(self, string):
         return self._parse(self.lexis_analyzer.analyze(string))
@@ -26,11 +25,11 @@ class Parser:
         if forbidden_operators is None:
             forbidden_operators = []
 
-        if len(lexis_string) == 0:
+        if len(lexis_string) == 0 or len(lexis_string[0]) == 0:
             return None
 
         for o in (o for o in self.operators if o not in forbidden_operators):
-            result = o.parse(lexis_string, self.braces_pairs, self.element_pattern)
+            result = o.parse(lexis_string, self.braces_pairs)
 
             for data in result:
                 args = [self._parse(a) for a in data.arguments]

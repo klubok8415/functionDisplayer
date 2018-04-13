@@ -4,7 +4,7 @@ class LexisElement:
         self.type = type_
 
     def __eq__(self, other):
-        return self.string == other.string
+        return self.type == other.type and self.string == other.string
 
-    def __str__(self):
-        return str.format('<{type}: "{string}"', type=self.type, string=self.string)
+    def __repr__(self):
+        return str.format('<{type}: "{string}">', type=self.type, string=self.string)

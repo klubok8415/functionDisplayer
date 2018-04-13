@@ -6,34 +6,34 @@ from function_parser.parser import Parser
 
 default_parser = Parser(
     [
-        # FunctionOperator("sin", Sinus, 1),
-        # FunctionOperator("cos", Cosine, 1),
-        # FunctionOperator("tan", Tangent, 1),
-        # FunctionOperator("cot", Cotangent, 1),
+        FunctionOperator("sin", Sinus, 1),
+        FunctionOperator("cos", Cosine, 1),
+        FunctionOperator("tan", Tangent, 1),
+        FunctionOperator("cot", Cotangent, 1),
 
-        # FunctionOperator("arcsin", Arcsine, 1),
-        # FunctionOperator("arccos", Arccosine, 1),
-        # FunctionOperator("arctan", Arctangent, 1),
-        # FunctionOperator("arccot", Arccotangent, 1),
+        FunctionOperator("arcsin", Arcsine, 1),
+        FunctionOperator("arccos", Arccosine, 1),
+        FunctionOperator("arctan", Arctangent, 1),
+        FunctionOperator("arccot", Arccotangent, 1),
 
-        # FunctionOperator("log", Logarithm, 2),
-        # FunctionOperator("ln", NaturalLogarithm, 1),
+        FunctionOperator("log", Logarithm, 2),
+        FunctionOperator("ln", NaturalLogarithm, 1),
 
-        # FunctionOperator("sqrt", Sqrt, 1),
+        FunctionOperator("sqrt", Sqrt, 1),
 
         VariableOperator(),
         ConstantOperator(),
 
-        # InfixOperator("+", Addition),
-        # InfixOperator("-", Deduction),
+        InfixOperator("+", Addition),
+        InfixOperator("-", Deduction),
 
         Prefix("-", AdditiveInversion),
 
-        # InfixOperator("*", Multiplication),
-        # InfixOperator("/", Division),
+        InfixOperator("*", Multiplication),
+        InfixOperator("/", Division),
 
-        # InfixOperator("ˆ", Power),
-        # InfixOperator("**", Power),
+        InfixOperator("ˆ", Power),
+        InfixOperator("**", Power),
     ],
     [
         # Brace("(", ")"),

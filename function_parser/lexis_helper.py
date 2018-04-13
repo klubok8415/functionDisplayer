@@ -15,17 +15,30 @@ def startswith(lexis_string, pattern):
 
 
 def endswith(lexis_string, pattern):
-    return len(lexis_string) >= len(pattern) \
-           and all(lexis_string[-i - 1] == pattern[-i - 1] for i in range(len(pattern)))
+    position = 0
+
+    for p in pattern[::-1]:
+        if position >= len(lexis_string):
+            return False
+
+        for e in lexis_string[-position - 1]:
+            if p == e:
+                position += len(e.string)
+                break
+        else:
+            return False
+    return True
 
 
 def split(lexis_string, separator):
     result = [[]]
 
-    for e in lexis_string:
-        if e == separator:
+    position = 0
+    while position < len(lexis_string):
+        if separator in lexis_string[position]:
             result.append([])
         else:
-            result[-1].append(e)
+            result[-1].append(lexis_string[position])
+        position += 1
 
     return result
